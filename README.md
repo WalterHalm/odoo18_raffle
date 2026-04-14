@@ -59,4 +59,4 @@ LGPL-3
 
 ## Autor
 
-ADDOMS
+Walter Halm
