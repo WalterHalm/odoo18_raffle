@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Template 1: Felicitacion al ganador -->
+        <record id="mail_template_raffle_winner" model="mail.template">
+            <field name="name">Sorteos: Felicitacion al Ganador</field>
+            <field name="model_id" ref="raffle_management.model_raffle_raffle"/>
+            <field name="subject">{{ object.company_id.name }} - Felicidades! Ganaste el sorteo {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email_formatted or object.company_id.email) }}</field>
+            <field name="partner_to">{{ object.winner_partner_id.id }}</field>
+            <field name="description">Se envia al ganador cuando se ejecuta el sorteo</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+        Hola <t t-out="object.winner_partner_id.name or ''">Cliente</t>!
+        <br/><br/>
+        <strong>Felicidades! Has ganado el sorteo <t t-out="object.name or ''">RIFA-0001</t>!</strong>
+        <br/><br/>
+        <strong>Detalle del premio:</strong>
+        <br/>
+        Producto: <strong><t t-out="object.product_id.name or ''">Producto</t></strong>
+        <br/>
+        Tu ticket ganador: <strong>#<t t-out="object.winner_ticket_id.number or ''">1</t></strong>
+        (<t t-out="object.winner_ticket_id.name or ''">RIFA-001</t>)
+        <br/><br/>
+        <strong>Proximos pasos:</strong>
+        <br/>
+        1. Ingresa a tu cuenta en nuestro sitio web
+        <br/>
+        2. En la seccion "Mis Tickets de Rifa" comparti el link de tu publicacion en redes sociales
+        <br/>
+        3. Nos pondremos en contacto para coordinar la entrega de tu premio
+        <br/><br/>
+        Gracias por participar!
+        <br/><br/>
+    </p>
+</div>
+            </field>
+            <field name="lang">{{ object.winner_partner_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+
+        <!-- Template 2: Confirmacion de cancelacion (vinculado a raffle.ticket) -->
+        <record id="mail_template_raffle_cancellation" model="mail.template">
+            <field name="name">Sorteos: Confirmacion de Cancelacion de Ticket</field>
+            <field name="model_id" ref="raffle_management.model_raffle_ticket"/>
+            <field name="subject">{{ object.raffle_id.company_id.name }} - Ticket cancelado - Sorteo {{ object.raffle_id.name }}</field>
+            <field name="email_from">{{ (object.raffle_id.company_id.email_formatted or object.raffle_id.company_id.email) }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="description">Se envia al cliente cuando cancela un ticket desde el portal</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+        Hola <t t-out="object.partner_id.name or ''">Cliente</t>,
+        <br/><br/>
+        Te confirmamos que tu ticket ha sido cancelado exitosamente.
+        <br/><br/>
+        <strong>Detalle de la cancelacion:</strong>
+        <br/>
+        Ticket: <strong>#<t t-out="object.number or ''">1</t></strong>
+        (<t t-out="object.name or ''">RIFA-001</t>)
+        <br/>
+        Sorteo: <strong><t t-out="object.raffle_id.name or ''">RIFA-0001</t></strong>
+        <br/>
+        Producto en sorteo: <strong><t t-out="object.raffle_id.product_id.name or ''">Producto</t></strong>
+        <br/><br/>
+        El numero ha sido liberado y esta disponible nuevamente para otros participantes.
+        El reembolso sera gestionado por nuestro equipo.
+        <br/><br/>
+        Si tenes alguna consulta, no dudes en contactarnos.
+        <br/><br/>
+    </p>
+</div>
+            </field>
+            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+
+        <!-- Template 3: Resultado del sorteo a participantes (vinculado a raffle.ticket) -->
+        <record id="mail_template_raffle_results" model="mail.template">
+            <field name="name">Sorteos: Resultado del Sorteo a Participantes</field>
+            <field name="model_id" ref="raffle_management.model_raffle_ticket"/>
+            <field name="subject">{{ object.raffle_id.company_id.name }} - Resultado del sorteo {{ object.raffle_id.name }}</field>
+            <field name="email_from">{{ (object.raffle_id.company_id.email_formatted or object.raffle_id.company_id.email) }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="description">Se envia a todos los participantes cuando se ejecuta el sorteo</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+        Hola <t t-out="object.partner_id.name or ''">Cliente</t>,
+        <br/><br/>
+        Te informamos que el sorteo <strong><t t-out="object.raffle_id.name or ''">RIFA-0001</t></strong> ha finalizado.
+        <br/><br/>
+        <strong>Resultado:</strong>
+        <br/>
+        Producto sorteado: <strong><t t-out="object.raffle_id.product_id.name or ''">Producto</t></strong>
+        <br/>
+        Ganador: <strong><t t-out="object.raffle_id.winner_partner_id.display_nickname or ''">Participante</t></strong>
+        <br/>
+        Numero ganador: <strong>#<t t-out="object.raffle_id.winner_ticket_id.number or ''">1</t></strong>
+        <br/><br/>
+        Gracias por participar! Te invitamos a seguir participando en nuestros proximos sorteos.
+        <br/><br/>
+    </p>
+</div>
+            </field>
+            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

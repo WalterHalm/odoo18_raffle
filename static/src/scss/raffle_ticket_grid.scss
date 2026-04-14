@@ -1,0 +1,223 @@
+/* Estilos de la cuadrícula de tickets de rifa
+   Requerimiento: verde agua (disponible), rojo pastel (vendido) */
+
+.raffle-grid-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.raffle-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    padding: 10px;
+}
+
+/* Ticket base */
+.raffle-ticket {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.raffle-ticket-number {
+    z-index: 1;
+}
+
+/* Disponible: verde agua */
+.raffle-ticket.raffle-available {
+    background-color: #7fdbca;
+    color: #1a5c4e;
+    cursor: pointer;
+    border-color: #5cc4b0;
+}
+
+.raffle-ticket.raffle-available:hover {
+    background-color: #5cc4b0;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(92, 196, 176, 0.5);
+    z-index: 2;
+}
+
+/* Vendido: rojo pastel */
+.raffle-ticket.raffle-sold {
+    background-color: #f4a0a0;
+    color: #8b2020;
+    cursor: default;
+    border-color: #e88080;
+}
+
+.raffle-ticket.raffle-sold:hover {
+    box-shadow: 0 2px 8px rgba(244, 160, 160, 0.5);
+}
+
+/* Reservado: naranja */
+.raffle-ticket.raffle-reserved {
+    background-color: #ffcc66;
+    color: #7a5500;
+    cursor: default;
+    border-color: #f0b840;
+    position: relative;
+}
+
+.raffle-ticket.raffle-reserved:hover {
+    box-shadow: 0 2px 8px rgba(255, 204, 102, 0.5);
+}
+
+/* Ganador: dorado */
+.raffle-ticket.raffle-winner {
+    background-color: #ffd700;
+    color: #7a6200;
+    cursor: default;
+    border-color: #e6c200;
+    animation: winner-pulse 1.5s infinite;
+}
+
+/* Cancelado: gris */
+.raffle-ticket.raffle-cancelled {
+    background-color: #e0e0e0;
+    color: #999;
+    cursor: default;
+    border-color: #ccc;
+}
+
+/* Muestra de color para la leyenda */
+.raffle-ticket-sample {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.raffle-ticket-sample.raffle-available {
+    background-color: #7fdbca;
+}
+
+.raffle-ticket-sample.raffle-sold {
+    background-color: #f4a0a0;
+}
+
+.raffle-ticket-sample.raffle-reserved {
+    background-color: #ffcc66;
+}
+
+.raffle-ticket-sample.raffle-winner {
+    background-color: #ffd700;
+}
+
+/* Animación del ganador */
+@keyframes winner-pulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+}
+
+/* Countdown dentro del ticket reservado */
+.raffle-countdown {
+    position: absolute;
+    bottom: 1px;
+    left: 0;
+    right: 0;
+    font-size: 8px;
+    font-weight: 700;
+    color: #7a5500;
+    text-align: center;
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* Tooltip del comprador al hacer hover en ticket vendido */
+.raffle-ticket.raffle-sold[data-buyer]:not([data-buyer=""]):hover::after {
+    content: attr(data-buyer);
+    position: absolute;
+    bottom: 105%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: normal;
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Responsive: menos columnas en móvil */
+@media (max-width: 576px) {
+    .raffle-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+    }
+    .raffle-ticket {
+        font-size: 11px;
+        border-radius: 6px;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .raffle-grid {
+        grid-template-columns: repeat(8, 1fr);
+    }
+}
+
+/* Mini popup de confirmación al seleccionar ticket */
+.raffle-popup {
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    min-width: 180px;
+}
+
+.raffle-popup-content {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    font-size: 13px;
+}
+
+.raffle-popup-content p {
+    margin-bottom: 8px;
+}
+
+/* Estado loading */
+.raffle-ticket.raffle-loading {
+    pointer-events: none;
+}
+
+/* Highlight al buscar un ticket */
+.raffle-ticket.raffle-highlight {
+    outline: 3px solid #0d6efd;
+    outline-offset: 2px;
+    animation: raffle-blink 0.5s ease 3;
+    z-index: 5;
+}
+
+@keyframes raffle-blink {
+    0%, 100% { outline-color: #0d6efd; }
+    50% { outline-color: transparent; }
+}
+
+/* Buscador */
+.raffle-search-container .form-control::-webkit-inner-spin-button,
+.raffle-search-container .form-control::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.raffle-search-container .form-control[type=number] {
+    -moz-appearance: textfield;
+}

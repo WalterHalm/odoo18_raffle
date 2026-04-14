@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Campos WhatsApp/DNI/Nickname en formulario de contacto -->
+    <record id="view_partner_form_raffle" model="ir.ui.view">
+        <field name="name">res.partner.form.raffle</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="website" position="after">
+                <field name="whatsapp_number" widget="phone" string="WhatsApp"/>
+                <field name="dni_number" string="DNI"/>
+                <field name="nickname" string="Nickname"/>
+            </field>
+        </field>
+    </record>
+</odoo>

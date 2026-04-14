@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extensión del formulario de registro con campos WhatsApp, DNI, Nickname -->
+    <template id="raffle_signup_fields" inherit_id="auth_signup.fields"
+              name="Campos de Registro para Rifas">
+        <!-- WhatsApp y DNI después del nombre -->
+        <xpath expr="//div[hasclass('field-name')]" position="after">
+            <div class="mb-3 field-whatsapp_number">
+                <label for="whatsapp_number">WhatsApp <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa fa-whatsapp text-success"/></span>
+                    <input type="tel" name="whatsapp_number"
+                           t-att-value="whatsapp_number"
+                           id="whatsapp_number"
+                           class="form-control form-control-sm"
+                           placeholder="Ej: +51 999 888 777"
+                           required="required"/>
+                </div>
+            </div>
+            <div class="mb-3 field-dni_number">
+                <label for="dni_number">DNI <span class="text-danger">*</span></label>
+                <input type="text" name="dni_number"
+                       t-att-value="dni_number"
+                       id="dni_number"
+                       class="form-control form-control-sm"
+                       placeholder="Ej: 12345678"
+                       required="required"
+                       maxlength="15"/>
+                <small class="text-muted">
+                    <i class="fa fa-info-circle"/> Se usará como contraseña por defecto.
+                </small>
+            </div>
+            <div class="mb-3 field-nickname">
+                <label for="nickname">Nickname <span class="text-muted">(opcional)</span></label>
+                <input type="text" name="nickname"
+                       t-att-value="nickname"
+                       id="nickname"
+                       class="form-control form-control-sm"
+                       placeholder="Tu apodo público en las rifas"/>
+            </div>
+        </xpath>
+
+        <!-- Ocultar campos de contraseña visualmente pero mantenerlos funcionales -->
+        <xpath expr="//div[hasclass('field-password')]" position="attributes">
+            <attribute name="t-attf-class">mb-3 field-password pt-2 #{'' if token else 'd-none'}</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('field-confirm_password')]" position="attributes">
+            <attribute name="t-attf-class">mb-3 field-confirm_password #{'' if token else 'd-none'}</attribute>
+        </xpath>
+
+        <!-- Quitar required nativo para que el navegador no bloquee el submit -->
+        <xpath expr="//input[@name='password']" position="attributes">
+            <attribute name="required"></attribute>
+        </xpath>
+        <xpath expr="//input[@name='confirm_password']" position="attributes">
+            <attribute name="required"></attribute>
+        </xpath>
+    </template>
+
+    <!-- JS para auto-completar contraseña con DNI al enviar el formulario -->
+    <template id="raffle_signup_js" inherit_id="auth_signup.signup"
+              name="JS Auto-fill Password con DNI">
+        <xpath expr="//form[hasclass('oe_signup_form')]" position="inside">
+            <script t-if="not token">
+                document.querySelector('.oe_signup_form').addEventListener('submit', function(e) {
+                    var dni = document.getElementById('dni_number');
+                    var pwd = document.getElementById('password');
+                    var cpwd = document.getElementById('confirm_password');
+                    if (dni &amp;&amp; pwd &amp;&amp; cpwd &amp;&amp; !pwd.value) {
+                        pwd.value = dni.value;
+                        cpwd.value = dni.value;
+                    }
+                });
+            </script>
+        </xpath>
+    </template>
+</odoo>

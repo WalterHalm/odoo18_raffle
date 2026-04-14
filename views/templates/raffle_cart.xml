@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Countdown de reserva en cada línea del carrito -->
+    <template id="cart_line_raffle_countdown"
+              inherit_id="website_sale.cart_lines"
+              name="Countdown Reserva Ticket Rifa">
+        <xpath expr="//div[@name='o_wsale_cart_line_button_container']" position="before">
+            <t t-if="line.raffle_ticket_id and line.raffle_ticket_id.state == 'reserved' and line.raffle_ticket_id.reservation_expiry">
+                <div class="raffle-cart-countdown alert alert-warning py-1 px-2 mb-1 small"
+                     t-att-data-expiry="line.raffle_ticket_id.reservation_expiry.isoformat() + 'Z'">
+                    <i class="fa fa-clock-o"/>
+                    Reservado: <span class="raffle-cart-timer fw-bold">--:--</span>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

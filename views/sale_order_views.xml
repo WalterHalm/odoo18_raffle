@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Campo Ticket de Rifa en el formulario de línea de orden de venta -->
+    <record id="view_sale_order_form_raffle" model="ir.ui.view">
+        <field name="name">sale.order.form.raffle</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Agregar campo en el form inline de la línea -->
+            <xpath expr="//field[@name='order_line']//form//field[@name='product_type']" position="after">
+                <field name="raffle_ticket_id"
+                       string="Ticket de Rifa"
+                       domain="[('raffle_id.ticket_product_id.product_tmpl_id', '=', product_template_id), ('state', '=', 'available')]"
+                       invisible="not product_template_id"
+                       context="{'default_raffle_id': raffle_ticket_id}"/>
+            </xpath>
+            <!-- Agregar campo en la lista inline de líneas -->
+            <xpath expr="//field[@name='order_line']//list//field[@name='product_uom_qty']" position="before">
+                <field name="raffle_ticket_id" string="Ticket" optional="show"
+                       domain="[('raffle_id.ticket_product_id.product_tmpl_id', '=', product_template_id), ('state', '=', 'available')]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cron: liberar tickets reservados cuya reserva expiró (cada 1 minuto) -->
+    <record id="cron_release_expired_tickets" model="ir.cron">
+        <field name="name">Sorteos: Liberar tickets reservados expirados</field>
+        <field name="model_id" ref="model_raffle_ticket"/>
+        <field name="state">code</field>
+        <field name="code">model.action_release_expired()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">minutes</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Cron: completar sorteos 34h después de vender el último ticket (cada 30 min) -->
+    <record id="cron_complete_sold_raffles" model="ir.cron">
+        <field name="name">Sorteos: Completar sorteos con todos los tickets vendidos</field>
+        <field name="model_id" ref="model_raffle_raffle"/>
+        <field name="state">code</field>
+        <field name="code">model.action_complete_sold_raffles()</field>
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

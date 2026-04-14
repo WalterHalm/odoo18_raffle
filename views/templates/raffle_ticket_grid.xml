@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cuadrícula de tickets inyectada en la página de detalle del producto -->
+    <template id="raffle_ticket_grid" inherit_id="website_sale.product" name="Cuadrícula de Tickets de Rifa">
+        <xpath expr="//div[@id='product_full_description']" position="before">
+            <t t-if="raffle">
+                <section class="container mt-4 mb-4">
+                    <!-- Información del sorteo -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h3 class="text-center">🎟️ Seleccioná tu número de la suerte</h3>
+                            <div class="d-flex justify-content-center flex-wrap gap-2 gap-md-4 mb-3">
+                                <span class="badge bg-success fs-6">
+                                    <i class="fa fa-check-circle"/> Disponibles: <t t-out="raffle.available_tickets_count"/>
+                                </span>
+                                <span class="badge bg-danger fs-6">
+                                    <i class="fa fa-times-circle"/> Vendidos: <t t-out="raffle.sold_tickets_count"/>
+                                </span>
+                                <span class="badge bg-secondary fs-6">
+                                    <i class="fa fa-ticket"/> Total: <t t-out="raffle.total_tickets"/>
+                                </span>
+                            </div>
+                            <t t-if="raffle.draw_date">
+                                <p class="text-center text-muted">
+                                    📅 Fecha del sorteo: <strong t-field="raffle.draw_date" t-options="{'widget': 'datetime'}"/>
+                                </p>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- Leyenda de colores -->
+                    <div class="d-flex justify-content-center gap-3 mb-3">
+                        <span><span class="raffle-ticket-sample raffle-available"/> Disponible</span>
+                        <span><span class="raffle-ticket-sample raffle-reserved"/> Reservado</span>
+                        <span><span class="raffle-ticket-sample raffle-sold"/> Vendido</span>
+                        <span><span class="raffle-ticket-sample raffle-winner"/> Ganador</span>
+                    </div>
+
+                    <!-- Buscador de ticket por número -->
+                    <div class="raffle-search-container mb-3">
+                        <div class="input-group mx-auto" style="max-width: 400px;">
+                            <span class="input-group-text"><i class="fa fa-search"/></span>
+                            <input type="number" class="form-control raffle-search-input"
+                                   placeholder="Buscar número de ticket..."
+                                   min="1" t-att-max="raffle.total_tickets"/>
+                            <button class="btn btn-primary raffle-search-btn" type="button">
+                                Buscar
+                            </button>
+                        </div>
+                        <div class="raffle-search-result text-center mt-2" style="display:none;"/>
+                    </div>
+
+                    <!-- Cuadrícula de tickets -->
+                    <div class="raffle-grid-container" t-att-data-tickets="raffle_tickets_json"
+                         t-att-data-total="raffle.total_tickets"
+                         t-att-data-raffle-id="raffle.id">
+                        <div class="raffle-grid">
+                            <t t-foreach="raffle_tickets" t-as="ticket">
+                                <div t-attf-class="raffle-ticket raffle-#{ticket.state}"
+                                     t-att-data-ticket-id="ticket.id"
+                                     t-att-data-ticket-number="ticket.number"
+                                     t-att-data-ticket-state="ticket.state"
+                                     t-att-data-buyer="ticket.partner_id.display_nickname if ticket.partner_id else ''"
+                                     t-att-title="'%s - %s' % (ticket.name, ticket.partner_id.display_nickname) if ticket.partner_id else ticket.name">
+                                    <span class="raffle-ticket-number" t-out="ticket.number"/>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- Progreso -->
+                    <div class="mt-3">
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-danger"
+                                 role="progressbar"
+                                 t-att-style="'width: ' + str(int(raffle.progress)) + '%%'"
+                                 t-att-aria-valuenow="raffle.progress"
+                                 aria-valuemin="0" aria-valuemax="100">
+                                <t t-out="int(raffle.progress)"/>% vendido
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </t>
+        </xpath>
+    </template>
+</odoo>

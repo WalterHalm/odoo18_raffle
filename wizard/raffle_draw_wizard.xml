@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_raffle_draw_wizard_form" model="ir.ui.view">
+        <field name="name">raffle.draw.wizard.form</field>
+        <field name="model">raffle.draw.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Ejecutar Sorteo">
+                <group>
+                    <group>
+                        <field name="raffle_id" readonly="1"/>
+                        <field name="product_name"/>
+                    </group>
+                    <group>
+                        <field name="sold_tickets_count"/>
+                        <field name="total_tickets"/>
+                        <field name="seed_sum"/>
+                    </group>
+                </group>
+                <separator string="⚠️ Esta acción es irreversible"/>
+                <p class="text-muted">
+                    Al ejecutar el sorteo, se seleccionará un ganador aleatorio
+                    basado en la semilla acumulada de todas las ventas de tickets.
+                    El resultado es auditable y reproducible.
+                </p>
+                <footer>
+                    <button name="action_execute_draw" string="🎲 Ejecutar Sorteo"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_raffle_draw_wizard" model="ir.actions.act_window">
+        <field name="name">Ejecutar Sorteo</field>
+        <field name="res_model">raffle.draw.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

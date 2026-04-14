@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_raffle" model="ir.ui.view">
+        <field name="name">res.config.settings.form.raffle</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Sorteos" name="raffle_management">
+                    <block title="WhatsApp API" name="raffle_whatsapp">
+                        <setting string="Proveedor de WhatsApp"
+                                 help="Configurar el proveedor para envío de mensajes WhatsApp">
+                            <field name="raffle_whatsapp_provider"/>
+                        </setting>
+                        <setting string="Credenciales"
+                                 invisible="raffle_whatsapp_provider == 'none'"
+                                 help="Credenciales del proveedor de WhatsApp API">
+                            <div class="row mt-2">
+                                <label for="raffle_whatsapp_account_sid" class="col-lg-3"/>
+                                <field name="raffle_whatsapp_account_sid" class="col-lg-4"/>
+                            </div>
+                            <div class="row mt-2">
+                                <label for="raffle_whatsapp_auth_token" class="col-lg-3"/>
+                                <field name="raffle_whatsapp_auth_token" class="col-lg-4" password="True"/>
+                            </div>
+                            <div class="row mt-2">
+                                <label for="raffle_whatsapp_from_number" class="col-lg-3"/>
+                                <field name="raffle_whatsapp_from_number" class="col-lg-4"/>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Notificaciones por Email" name="raffle_email">
+                        <setting string="Email al ganador"
+                                 help="Enviar email de felicitacion al ganador cuando se ejecuta el sorteo">
+                            <field name="raffle_mail_winner"/>
+                        </setting>
+                        <setting string="Email al cancelar ticket"
+                                 help="Enviar email de confirmacion cuando un cliente cancela un ticket">
+                            <field name="raffle_mail_cancellation"/>
+                        </setting>
+                        <setting string="Email de resultados a participantes"
+                                 help="Enviar email con el resultado del sorteo a todos los participantes">
+                            <field name="raffle_mail_results"/>
+                        </setting>
+                    </block>
+                    <block title="Gestion de Sorteos" name="raffle_management_config">
+                        <setting string="Responsable de Sorteos"
+                                 help="Usuario del sistema al que se asignan las actividades de cancelacion y seguimiento de reembolsos">
+                            <field name="raffle_responsible_user_id"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

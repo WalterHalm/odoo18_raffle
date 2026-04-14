@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============ LIST VIEW ============ -->
+    <record id="view_raffle_ticket_list" model="ir.ui.view">
+        <field name="name">raffle.ticket.list</field>
+        <field name="model">raffle.ticket</field>
+        <field name="arch" type="xml">
+            <list string="Tickets"
+                  decoration-success="state == 'available'"
+                  decoration-info="state == 'reserved'"
+                  decoration-danger="state == 'sold'"
+                  decoration-warning="state == 'winner'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name" decoration-bf="1"/>
+                <field name="number"/>
+                <field name="raffle_id"/>
+                <field name="product_name" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'available'"
+                       decoration-info="state == 'reserved'"
+                       decoration-danger="state == 'sold'"
+                       decoration-warning="state == 'winner'"
+                       decoration-muted="state == 'cancelled'"/>
+                <field name="partner_id" optional="show"/>
+                <field name="purchase_date" optional="show"/>
+                <field name="ticket_price" widget="monetary" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="can_cancel" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============ FORM VIEW ============ -->
+    <record id="view_raffle_ticket_form" model="ir.ui.view">
+        <field name="name">raffle.ticket.form</field>
+        <field name="model">raffle.ticket</field>
+        <field name="arch" type="xml">
+            <form string="Ticket">
+                <header>
+                    <button name="action_cancel_ticket" string="Cancelar Ticket"
+                            type="object" class="btn-danger"
+                            invisible="not can_cancel"
+                            groups="raffle_management.group_raffle_manager"
+                            confirm="¿Cancelar este ticket? Se liberará para venta nuevamente."/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="raffle_id"/>
+                            <field name="number"/>
+                            <field name="ticket_price" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="purchase_date"/>
+                            <field name="cancellation_deadline"/>
+                            <field name="can_cancel"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============ SEARCH VIEW ============ -->
+    <record id="view_raffle_ticket_search" model="ir.ui.view">
+        <field name="name">raffle.ticket.search</field>
+        <field name="model">raffle.ticket</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Tickets">
+                <field name="name"/>
+                <field name="number"/>
+                <field name="raffle_id"/>
+                <field name="partner_id"/>
+                <separator/>
+                <filter string="Disponibles" name="available" domain="[('state', '=', 'available')]"/>
+                <filter string="Reservados" name="reserved" domain="[('state', '=', 'reserved')]"/>
+                <filter string="Vendidos" name="sold" domain="[('state', '=', 'sold')]"/>
+                <filter string="Ganador" name="winner" domain="[('state', '=', 'winner')]"/>
+                <separator/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Sorteo" name="group_raffle" context="{'group_by': 'raffle_id'}"/>
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Comprador" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============ ACTION ============ -->
+    <record id="action_raffle_ticket" model="ir.actions.act_window">
+        <field name="name">Tickets</field>
+        <field name="res_model">raffle.ticket</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_raffle_ticket_search"/>
+        <field name="context">{}</field>
+    </record>
+</odoo>

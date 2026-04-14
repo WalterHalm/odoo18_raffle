@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Card "Mis Tickets de Rifa" en /my home -->
+    <template id="portal_my_home_raffle" name="Mis Tickets de Rifa"
+              inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+            <t t-set="portal_client_category_enable" t-value="True"/>
+        </xpath>
+        <div id="portal_client_category" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/raffle_management/static/description/icon.png'"/>
+                <t t-set="title">Mis Tickets de Rifa</t>
+                <t t-set="url" t-value="'/my/raffle/tickets'"/>
+                <t t-set="text">Ver tus tickets comprados, premios y sorteos</t>
+                <t t-set="placeholder_count" t-value="'raffle_ticket_count'"/>
+            </t>
+        </div>
+    </template>
+
+    <!-- Breadcrumb -->
+    <template id="portal_my_home_menu_raffle" name="Portal: menú rifas"
+              inherit_id="portal.portal_breadcrumbs" priority="40">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'raffle_tickets'"
+                t-attf-class="breadcrumb-item #{'active' if not ticket else ''}">
+                <a t-if="ticket" t-attf-href="/my/raffle/tickets">Mis Tickets de Rifa</a>
+                <t t-else="">Mis Tickets de Rifa</t>
+            </li>
+        </xpath>
+    </template>
+
+    <!-- Lista de tickets del usuario -->
+    <template id="portal_my_raffle_tickets" name="Mis Tickets de Rifa">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Mis Tickets de Rifa</t>
+            </t>
+
+            <!-- Mensajes de éxito/error -->
+            <div t-if="request.params.get('success') == 'cancelled'"
+                 class="alert alert-success" role="alert">
+                <i class="fa fa-check-circle"/> Ticket cancelado exitosamente. El reembolso será procesado por el administrador.
+            </div>
+            <div t-if="request.params.get('success') == 'photo_uploaded'"
+                 class="alert alert-success" role="alert">
+                <i class="fa fa-check-circle"/> ¡Foto subida exitosamente! Gracias por compartir.
+            </div>
+            <div t-if="request.params.get('success') == 'social_shared'"
+                 class="alert alert-success" role="alert">
+                <i class="fa fa-check-circle"/> ¡Link de publicación guardado! Gracias por compartir en tus redes.
+            </div>
+            <div t-if="request.params.get('error') == 'cancel_failed'"
+                 class="alert alert-danger" role="alert">
+                <i class="fa fa-exclamation-circle"/> No se pudo cancelar el ticket. Es posible que haya pasado el límite de 24 horas.
+            </div>
+            <div t-if="request.params.get('error') == 'upload_failed' or request.params.get('error') == 'no_photo'"
+                 class="alert alert-danger" role="alert">
+                <i class="fa fa-exclamation-circle"/> No se pudo subir la foto. Intenta de nuevo.
+            </div>
+            <div t-if="request.params.get('error') == 'no_url'"
+                 class="alert alert-danger" role="alert">
+                <i class="fa fa-exclamation-circle"/> Debes ingresar el link a tu publicación.
+            </div>
+
+            <div t-if="not tickets" class="alert alert-warning" role="alert">
+                Aún no tienes tickets de rifa comprados.
+            </div>
+
+            <t t-if="tickets" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Ticket</th>
+                        <th>Sorteo</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-end d-none d-md-table-cell">Fecha Compra</th>
+                        <th class="text-end d-none d-md-table-cell">Precio</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="tickets" t-as="ticket">
+                        <tr>
+                            <td>
+                                <strong>#<t t-out="ticket.number"/></strong>
+                                <small class="text-muted d-block"><t t-out="ticket.name"/></small>
+                            </td>
+                            <td>
+                                <t t-out="ticket.raffle_id.product_id.name"/>
+                                <small class="text-muted d-block">
+                                    <t t-out="ticket.raffle_id.name"/>
+                                </small>
+                            </td>
+                            <td class="text-center">
+                                <span t-if="ticket.state == 'sold'"
+                                      class="badge bg-primary">Comprado</span>
+                                <span t-if="ticket.state == 'winner'"
+                                      class="badge bg-warning text-dark">
+                                    <i class="fa fa-trophy"/> ¡Ganador!
+                                </span>
+                            </td>
+                            <td class="text-end d-none d-md-table-cell">
+                                <span t-field="ticket.purchase_date"
+                                      t-options="{'widget': 'date'}"/>
+                            </td>
+                            <td class="text-end d-none d-md-table-cell">
+                                <span t-field="ticket.ticket_price"
+                                      t-options="{'widget': 'monetary', 'display_currency': ticket.currency_id}"/>
+                            </td>
+                            <td class="text-center">
+                                <!-- Cancelar solo si < 24h -->
+                                <t t-if="ticket.can_cancel">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger raffle-cancel-btn"
+                                            t-att-data-ticket-id="ticket.id"
+                                            t-att-data-ticket-number="ticket.number"
+                                            t-att-data-csrf="request.csrf_token()">
+                                        <i class="fa fa-times"/> Cancelar
+                                    </button>
+                                </t>
+                                <!-- Info premio ganador -->
+                                <t t-if="ticket.state == 'winner'">
+                                    <div class="d-flex flex-column gap-1 align-items-center">
+                                        <span t-if="ticket.raffle_id.state == 'delivered'"
+                                              class="badge bg-success">
+                                            <i class="fa fa-check-circle"/> Entregado
+                                        </span>
+                                        <span t-elif="ticket.raffle_id.state == 'finished'"
+                                              class="badge bg-info text-dark">
+                                            <i class="fa fa-clock-o"/> Pendiente de entrega
+                                        </span>
+                                        <!-- Subir foto -->
+                                        <t t-if="not ticket.raffle_id.winner_photo">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-warning raffle-photo-btn"
+                                                    t-att-data-ticket-id="ticket.id"
+                                                    t-att-data-ticket-number="ticket.number"
+                                                    t-att-data-csrf="request.csrf_token()">
+                                                <i class="fa fa-camera"/> Foto
+                                            </button>
+                                        </t>
+                                        <t t-if="ticket.raffle_id.winner_photo">
+                                            <span class="badge bg-success">
+                                                <i class="fa fa-check"/> Foto enviada
+                                            </span>
+                                        </t>
+                                        <!-- Compartir link redes sociales -->
+                                        <t t-if="not ticket.raffle_id.winner_social_url">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-primary raffle-social-btn"
+                                                    t-att-data-ticket-id="ticket.id"
+                                                    t-att-data-ticket-number="ticket.number"
+                                                    t-att-data-csrf="request.csrf_token()">
+                                                <i class="fa fa-share-alt"/> Publicación
+                                            </button>
+                                        </t>
+                                        <t t-if="ticket.raffle_id.winner_social_url">
+                                            <span class="badge bg-success">
+                                                <i class="fa fa-check"/> Link compartido
+                                            </span>
+                                        </t>
+                                    </div>
+                                </t>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <!-- Modal de confirmación de cancelación -->
+    <template id="portal_raffle_cancel_modal" name="Modal Cancelar Ticket"
+              inherit_id="portal.portal_layout" priority="40">
+        <xpath expr="//div[@id='wrap']" position="inside">
+            <div class="modal fade" id="raffleCancelModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title">
+                                <i class="fa fa-exclamation-triangle"/> Cancelar Ticket
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white"
+                                    data-bs-dismiss="modal" aria-label="Cerrar"/>
+                        </div>
+                        <div class="modal-body text-center py-4">
+                            <div class="mb-3">
+                                <i class="fa fa-ticket fa-3x text-danger"/>
+                            </div>
+                            <p class="fs-5">¿Estás seguro de cancelar el
+                                <strong>Ticket #<span id="raffleCancelNumber"/></strong>?
+                            </p>
+                            <p class="text-muted">
+                                El ticket volverá a estar disponible para otros participantes.
+                                Si la orden no tiene más tickets, será cancelada.
+                            </p>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">
+                                No, mantener
+                            </button>
+                            <form id="raffleCancelForm" method="post" class="d-inline">
+                                <input type="hidden" name="csrf_token" id="raffleCancelCsrf"/>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fa fa-times"/> Sí, cancelar ticket
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                document.addEventListener('click', function(e) {
+                    var btn = e.target.closest('.raffle-cancel-btn');
+                    if (!btn) return;
+                    var ticketId = btn.dataset.ticketId;
+                    var ticketNumber = btn.dataset.ticketNumber;
+                    var csrf = btn.dataset.csrf;
+                    document.getElementById('raffleCancelNumber').textContent = ticketNumber;
+                    document.getElementById('raffleCancelForm').action = '/my/raffle/ticket/cancel/' + ticketId;
+                    document.getElementById('raffleCancelCsrf').value = csrf;
+                    var modalEl = document.getElementById('raffleCancelModal');
+                    var Modal = window.bootstrap ? window.bootstrap.Modal : (window.BSN ? window.BSN.Modal : null);
+                    if (Modal) {
+                        new Modal(modalEl).show();
+                    } else {
+                        modalEl.classList.add('show');
+                        modalEl.style.display = 'block';
+                        document.body.classList.add('modal-open');
+                        var backdrop = document.createElement('div');
+                        backdrop.className = 'modal-backdrop fade show';
+                        backdrop.id = 'raffleCancelBackdrop';
+                        document.body.appendChild(backdrop);
+                        modalEl.querySelector('[data-bs-dismiss="modal"]').addEventListener('click', function() {
+                            modalEl.classList.remove('show');
+                            modalEl.style.display = 'none';
+                            document.body.classList.remove('modal-open');
+                            var bd = document.getElementById('raffleCancelBackdrop');
+                            if (bd) bd.remove();
+                        });
+                    }
+                });
+            </script>
+
+            <!-- Modal subir foto del ganador -->
+            <div class="modal fade" id="rafflePhotoModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-warning">
+                            <h5 class="modal-title">
+                                <i class="fa fa-camera"/> Subir Foto del Ganador
+                            </h5>
+                            <button type="button" class="btn-close"
+                                    data-bs-dismiss="modal" aria-label="Cerrar"/>
+                        </div>
+                        <form id="rafflePhotoForm" method="post" enctype="multipart/form-data">
+                            <div class="modal-body text-center py-4">
+                                <div class="mb-3">
+                                    <i class="fa fa-trophy fa-3x text-warning"/>
+                                </div>
+                                <p class="fs-5">¡Felicidades por ganar el
+                                    <strong>Ticket #<span id="rafflePhotoNumber"/></strong>!
+                                </p>
+                                <p class="text-muted">
+                                    Sube una foto para que podamos publicarla en nuestras redes sociales.
+                                </p>
+                                <input type="hidden" name="csrf_token" id="rafflePhotoCsrf"/>
+                                <div class="mb-3">
+                                    <input type="file" name="winner_photo" class="form-control"
+                                           accept="image/*" required="required"/>
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-center">
+                                <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fa fa-upload"/> Subir foto
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <script>
+                document.addEventListener('click', function(e) {
+                    var btn = e.target.closest('.raffle-photo-btn');
+                    if (!btn) return;
+                    var ticketId = btn.dataset.ticketId;
+                    var ticketNumber = btn.dataset.ticketNumber;
+                    var csrf = btn.dataset.csrf;
+                    document.getElementById('rafflePhotoNumber').textContent = ticketNumber;
+                    document.getElementById('rafflePhotoForm').action = '/my/raffle/ticket/upload_photo/' + ticketId;
+                    document.getElementById('rafflePhotoCsrf').value = csrf;
+                    var modalEl = document.getElementById('rafflePhotoModal');
+                    var Modal = window.bootstrap ? window.bootstrap.Modal : (window.BSN ? window.BSN.Modal : null);
+                    if (Modal) {
+                        new Modal(modalEl).show();
+                    } else {
+                        modalEl.classList.add('show');
+                        modalEl.style.display = 'block';
+                        document.body.classList.add('modal-open');
+                        var backdrop = document.createElement('div');
+                        backdrop.className = 'modal-backdrop fade show';
+                        backdrop.id = 'rafflePhotoBackdrop';
+                        document.body.appendChild(backdrop);
+                        var closeBtn = modalEl.querySelector('[data-bs-dismiss="modal"]');
+                        if (closeBtn) closeBtn.addEventListener('click', function() {
+                            modalEl.classList.remove('show');
+                            modalEl.style.display = 'none';
+                            document.body.classList.remove('modal-open');
+                            var bd = document.getElementById('rafflePhotoBackdrop');
+                            if (bd) bd.remove();
+                        });
+                    }
+                });
+            </script>
+
+            <!-- Modal compartir link de redes sociales -->
+            <div class="modal fade" id="raffleSocialModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title">
+                                <i class="fa fa-share-alt"/> Compartir Publicación
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white"
+                                    data-bs-dismiss="modal" aria-label="Cerrar"/>
+                        </div>
+                        <form id="raffleSocialForm" method="post">
+                            <div class="modal-body text-center py-4">
+                                <div class="mb-3">
+                                    <i class="fa fa-trophy fa-3x text-warning"/>
+                                </div>
+                                <p class="fs-5">¡Felicidades por ganar el
+                                    <strong>Ticket #<span id="raffleSocialNumber"/></strong>!
+                                </p>
+                                <p class="text-muted">
+                                    Compartí tu premio en tus redes sociales (Instagram, Facebook, TikTok)
+                                    y pegá el link de tu publicación acá.
+                                </p>
+                                <input type="hidden" name="csrf_token" id="raffleSocialCsrf"/>
+                                <div class="mb-3 text-start">
+                                    <label class="form-label fw-bold">Link de tu publicación</label>
+                                    <input type="url" name="social_url" class="form-control"
+                                           placeholder="https://instagram.com/p/..." required="required"/>
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-center">
+                                <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-share-alt"/> Guardar link
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <script>
+                document.addEventListener('click', function(e) {
+                    var btn = e.target.closest('.raffle-social-btn');
+                    if (!btn) return;
+                    var ticketId = btn.dataset.ticketId;
+                    var ticketNumber = btn.dataset.ticketNumber;
+                    var csrf = btn.dataset.csrf;
+                    document.getElementById('raffleSocialNumber').textContent = ticketNumber;
+                    document.getElementById('raffleSocialForm').action = '/my/raffle/ticket/share_social/' + ticketId;
+                    document.getElementById('raffleSocialCsrf').value = csrf;
+                    var modalEl = document.getElementById('raffleSocialModal');
+                    var Modal = window.bootstrap ? window.bootstrap.Modal : (window.BSN ? window.BSN.Modal : null);
+                    if (Modal) {
+                        new Modal(modalEl).show();
+                    } else {
+                        modalEl.classList.add('show');
+                        modalEl.style.display = 'block';
+                        document.body.classList.add('modal-open');
+                        var backdrop = document.createElement('div');
+                        backdrop.className = 'modal-backdrop fade show';
+                        backdrop.id = 'raffleSocialBackdrop';
+                        document.body.appendChild(backdrop);
+                        var closeBtn = modalEl.querySelector('[data-bs-dismiss="modal"]');
+                        if (closeBtn) closeBtn.addEventListener('click', function() {
+                            modalEl.classList.remove('show');
+                            modalEl.style.display = 'none';
+                            document.body.classList.remove('modal-open');
+                            var bd = document.getElementById('raffleSocialBackdrop');
+                            if (bd) bd.remove();
+                        });
+                    }
+                });
+            </script>
+        </xpath>
+    </template>
+
+    <!-- Campos Nickname y WhatsApp en /my/account -->
+    <template id="portal_my_details_raffle_fields" name="Campos Rifa en Mi Cuenta"
+              inherit_id="portal.portal_my_details_fields" priority="40">
+        <xpath expr="//div[./input[@name='phone']]" position="after">
+            <div t-attf-class="mb-3 col-xl-6">
+                <label class="col-form-label label-optional" for="whatsapp_number">WhatsApp</label>
+                <input type="tel" name="whatsapp_number"
+                       class="form-control"
+                       t-att-value="whatsapp_number or partner.whatsapp_number"/>
+            </div>
+            <div t-attf-class="mb-3 col-xl-6">
+                <label class="col-form-label label-optional" for="nickname">Nickname (apodo público)</label>
+                <input type="text" name="nickname"
+                       class="form-control"
+                       t-att-value="nickname or partner.nickname"
+                       placeholder="Se mostrará en los sorteos"/>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

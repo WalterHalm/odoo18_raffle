@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Odoo
+*.pyc
+
+# Memory bank (desarrollo interno)
+.amazonq/
+
+# Documentacion interna (no es codigo del modulo)
+MANUAL_USUARIO_SORTEOS.md
+ALCANCE_PROYECTO_SORTEOS.md
+nuevos_requerimientos.txt
+*.pdf
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

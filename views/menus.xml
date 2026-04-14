@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menú principal -->
+    <menuitem id="menu_raffle_root"
+              name="Sorteos"
+              web_icon="raffle_management,static/description/icon.png"
+              sequence="45"
+              groups="group_raffle_user"/>
+
+    <!-- Submenú: Sorteos -->
+    <menuitem id="menu_raffle_raffles"
+              name="Sorteos"
+              parent="menu_raffle_root"
+              sequence="10"/>
+
+    <menuitem id="menu_raffle_raffle_list"
+              name="Todos los Sorteos"
+              parent="menu_raffle_raffles"
+              action="action_raffle_raffle"
+              sequence="10"/>
+
+    <menuitem id="menu_raffle_ticket_list"
+              name="Tickets"
+              parent="menu_raffle_raffles"
+              action="action_raffle_ticket"
+              sequence="20"/>
+
+    <!-- Submenú: WhatsApp -->
+    <menuitem id="menu_raffle_whatsapp"
+              name="WhatsApp"
+              parent="menu_raffle_root"
+              sequence="20"/>
+
+    <menuitem id="menu_raffle_whatsapp_messages"
+              name="Mensajes Enviados"
+              parent="menu_raffle_whatsapp"
+              action="action_whatsapp_message"
+              sequence="10"/>
+
+    <!-- Submenú: Configuración -->
+    <menuitem id="menu_raffle_config"
+              name="Configuración"
+              parent="menu_raffle_root"
+              sequence="90"
+              groups="group_raffle_manager"/>
+</odoo>

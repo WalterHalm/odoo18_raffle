@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_raffle_raffle_user,raffle.raffle.user,model_raffle_raffle,group_raffle_user,1,0,0,0
+access_raffle_raffle_manager,raffle.raffle.manager,model_raffle_raffle,group_raffle_manager,1,1,1,1
+access_raffle_ticket_user,raffle.ticket.user,model_raffle_ticket,group_raffle_user,1,0,0,0
+access_raffle_ticket_manager,raffle.ticket.manager,model_raffle_ticket,group_raffle_manager,1,1,1,1
+access_raffle_ticket_portal,raffle.ticket.portal,model_raffle_ticket,base.group_portal,1,0,0,0
+access_raffle_raffle_portal,raffle.raffle.portal,model_raffle_raffle,base.group_portal,1,0,0,0
+access_raffle_draw_wizard,raffle.draw.wizard,model_raffle_draw_wizard,group_raffle_manager,1,1,1,0
+access_whatsapp_message_user,whatsapp.message.user,model_whatsapp_message,group_raffle_user,1,0,0,0
+access_whatsapp_message_manager,whatsapp.message.manager,model_whatsapp_message,group_raffle_manager,1,1,1,1
+access_raffle_raffle_public,raffle.raffle.public,model_raffle_raffle,base.group_public,1,0,0,0
+access_raffle_ticket_public,raffle.ticket.public,model_raffle_ticket,base.group_public,1,0,0,0
