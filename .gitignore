@@ -15,6 +15,7 @@ MANUAL_USUARIO_SORTEOS.md
 ALCANCE_PROYECTO_SORTEOS.md
 nuevos_requerimientos.txt
 *.pdf
+DESPLIEGUE_PRODUCCION.md
 
 # IDE
 .vscode/

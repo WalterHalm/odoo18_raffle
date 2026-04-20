@@ -323,12 +323,6 @@ class RaffleRaffle(models.Model):
                 raise UserError(_('Solo se puede volver a borrador desde Cancelado.'))
             rec.state = 'draft'
 
-    def action_force_complete(self):
-        """[TEST] Forzar estado a completado para testing. Solo visible en modo debug."""
-        for rec in self:
-            if rec.state == 'on_sale':
-                rec.state = 'completed'
-
     def action_view_tickets(self):
         """Abrir vista de tickets filtrada por este sorteo (botón estadístico)."""
         self.ensure_one()

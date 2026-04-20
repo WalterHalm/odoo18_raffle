@@ -73,8 +73,19 @@ class SaleOrderLine(models.Model):
 
 class SaleOrder(models.Model):
     """Herencia de sale.order para que cada ticket de rifa
-    sea una línea separada en el carrito (no agrupa cantidades)."""
+    sea una linea separada en el carrito y se vendan al completar checkout."""
     _inherit = 'sale.order'
+
+    def action_quotation_sent(self):
+        """Override: al enviar la cotizacion (checkout con pago pendiente),
+        marcar los tickets de rifa como vendidos para que no se liberen."""
+        res = super().action_quotation_sent()
+        for order in self:
+            for line in order.order_line.filtered(
+                lambda l: l.raffle_ticket_id and l.raffle_ticket_id.state == 'reserved'
+            ):
+                line._sell_raffle_ticket()
+        return res
 
     def _cart_find_product_line(self, product_id, line_id=None, **kwargs):
         """Para productos de rifa, no agrupar al agregar (line_id=None).

@@ -15,10 +15,6 @@
                             type="object" class="btn-primary"
                             invisible="state not in ('completed', 'draw_pending')"
                             groups="raffle_management.group_raffle_manager"/>
-                    <button name="action_force_complete" string="[TEST] Forzar Completado"
-                            type="object" class="btn-warning"
-                            invisible="state != 'on_sale'"
-                            groups="base.group_no_one"/>
                     <button name="action_mark_delivered" string="Marcar Entregado"
                             type="object" class="btn-primary"
                             invisible="state != 'finished'"
