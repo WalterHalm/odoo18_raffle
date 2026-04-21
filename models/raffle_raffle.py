@@ -270,7 +270,7 @@ class RaffleRaffle(models.Model):
         """Cron: completa sorteos cuyo último ticket se vendió hace más de 34h.
         Si no hay tickets disponibles → pasa a 'completed' (y auto_draw si aplica).
         Si alguien canceló y hay tickets disponibles → limpia all_sold_date."""
-        deadline = fields.Datetime.now() - timedelta(hours=34)
+        deadline = fields.Datetime.now() - timedelta(hours=24)
         raffles = self.search([
             ('state', '=', 'on_sale'),
             ('all_sold_date', '!=', False),
