@@ -200,11 +200,20 @@ class RaffleRaffle(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        """Asigna secuencia automática RIFA-0001, RIFA-0002, etc."""
+        """Asigna secuencia automatica RIFA-0001, RIFA-0002, etc."""
         for vals in vals_list:
             if vals.get('name', _('Nuevo')) == _('Nuevo'):
                 vals['name'] = self.env['ir.sequence'].next_by_code('raffle.raffle') or _('Nuevo')
         return super().create(vals_list)
+
+    def unlink(self):
+        """Solo permite eliminar sorteos en estado borrador o cancelado."""
+        for rec in self:
+            if rec.state not in ('draft', 'cancelled'):
+                raise UserError(
+                    _('No se puede eliminar el sorteo %s porque no esta en estado Borrador o Cancelado.', rec.name)
+                )
+        return super().unlink()
 
     # --- Acciones de flujo (botones del formulario) ---
 
@@ -256,6 +265,10 @@ class RaffleRaffle(models.Model):
                 'winner_partner_id': winner.partner_id.id,
                 'state': 'finished',
             })
+            # Archivar producto ticket para que desaparezca de la tienda
+            if rec.ticket_product_id:
+                rec.ticket_product_id.product_tmpl_id.active = False
+                rec.ticket_product_id.active = False
             rec._send_draw_emails()
 
     def _on_all_tickets_sold(self):
