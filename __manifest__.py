@@ -41,6 +41,7 @@
         'views/templates/raffle_ticket_grid.xml',
         'views/templates/raffle_cart.xml',
         'views/templates/raffle_portal.xml',
+        'views/templates/raffle_winners.xml',
         'views/templates/auth_signup.xml',
         # Wizards
         'wizard/raffle_draw_wizard.xml',

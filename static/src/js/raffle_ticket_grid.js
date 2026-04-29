@@ -14,25 +14,28 @@ publicWidget.registry.RaffleTicketGrid = publicWidget.Widget.extend({
     start: function () {
         this.raffleId = this.el.dataset.raffleId;
         this._countdownIntervals = {};
+        this.readonly = this.el.dataset.readonly === '1';
 
-        // Iniciar countdowns para tickets ya reservados
-        this._initExistingReservations();
+        if (!this.readonly) {
+            // Iniciar countdowns para tickets ya reservados
+            this._initExistingReservations();
 
-        // Buscador
-        const section = this.el.closest('section');
-        if (section) {
-            const searchBtn = section.querySelector('.raffle-search-btn');
-            const searchInput = section.querySelector('.raffle-search-input');
-            if (searchBtn && searchInput) {
-                searchBtn.addEventListener('click', () => this._onSearch(searchInput, section));
-                searchInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') this._onSearch(searchInput, section);
-                });
+            // Buscador
+            const section = this.el.closest('section');
+            if (section) {
+                const searchBtn = section.querySelector('.raffle-search-btn');
+                const searchInput = section.querySelector('.raffle-search-input');
+                if (searchBtn && searchInput) {
+                    searchBtn.addEventListener('click', () => this._onSearch(searchInput, section));
+                    searchInput.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') this._onSearch(searchInput, section);
+                    });
+                }
             }
-        }
 
-        // Refrescar cuadrícula cada 30 segundos
-        this._refreshInterval = setInterval(() => this._refreshGrid(), 30000);
+            // Refrescar cuadrícula cada 30 segundos
+            this._refreshInterval = setInterval(() => this._refreshGrid(), 30000);
+        }
 
         return this._super.apply(this, arguments);
     },
@@ -71,8 +74,6 @@ publicWidget.registry.RaffleTicketGrid = publicWidget.Widget.extend({
         }
 
         const expiry = new Date(expiryIso);
-        const numberSpan = ticketEl.querySelector('.raffle-ticket-number');
-        const originalText = numberSpan.textContent;
 
         // Crear elemento de countdown
         let countdownEl = ticketEl.querySelector('.raffle-countdown');
@@ -219,6 +220,7 @@ publicWidget.registry.RaffleTicketGrid = publicWidget.Widget.extend({
     },
 
     _onTicketClick: function (ev) {
+        if (this.readonly) return;
         const ticketEl = ev.currentTarget;
         if (ticketEl.classList.contains('raffle-loading')) return;
 

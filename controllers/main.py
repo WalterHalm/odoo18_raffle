@@ -76,7 +76,7 @@ class RaffleTicketController(http.Controller):
     @http.route('/shop/raffle/ticket_status', type='json', auth='public', website=True)
     def raffle_ticket_status(self, raffle_id, **kwargs):
         """Devuelve el estado actual de todos los tickets de un sorteo.
-        Usado para refrescar la cuadrícula cuando expira una reserva."""
+        Usado para refrescar la cuadricula cuando expira una reserva."""
         raffle = request.env['raffle.raffle'].sudo().browse(int(raffle_id))
         if not raffle.exists():
             return {'error': 'Sorteo no encontrado'}
@@ -90,3 +90,78 @@ class RaffleTicketController(http.Controller):
                 'reservation_expiry': (t.reservation_expiry.isoformat() + 'Z') if t.reservation_expiry else False,
             } for t in tickets],
         }
+
+    @http.route(['/ganadores', '/ganadores/page/<int:page>'], type='http', auth='public', website=True, sitemap=True)
+    def raffle_winners(self, page=1, search='', **kw):
+        """Pagina publica de ganadores con tarjetas narrativas, busqueda y paginacion."""
+        domain = [
+            ('state', 'in', ('finished', 'delivered')),
+            ('winner_partner_id', '!=', False),
+        ]
+        if search:
+            # Intentar buscar por numero de ticket si es digito
+            ticket_domain = []
+            if search.lstrip('#').isdigit():
+                ticket_domain = [('winner_ticket_id.number', '=', int(search.lstrip('#')))]
+            if ticket_domain:
+                domain = ['&'] + domain + ['|', '|', '|',
+                    ('product_id.name', 'ilike', search),
+                    ('winner_partner_id.nickname', 'ilike', search),
+                    ('winner_partner_id.name', 'ilike', search),
+                ] + ticket_domain
+            else:
+                domain = ['&'] + domain + ['|', '|',
+                    ('product_id.name', 'ilike', search),
+                    ('winner_partner_id.nickname', 'ilike', search),
+                    ('winner_partner_id.name', 'ilike', search),
+                ]
+
+        Raffle = request.env['raffle.raffle'].sudo()
+        total = Raffle.search_count(domain)
+        per_page = 10
+        pager = request.website.pager(
+            url='/ganadores',
+            url_args={'search': search} if search else {},
+            total=total,
+            page=page,
+            step=per_page,
+        )
+        raffles = Raffle.search(domain, order='create_date desc', limit=per_page, offset=pager['offset'])
+        is_admin = request.env.user.has_group('raffle_management.group_raffle_manager')
+        return request.render('raffle_management.raffle_winners_page', {
+            'raffles': raffles,
+            'pager': pager,
+            'search': search,
+            'is_admin': is_admin,
+        })
+
+    @http.route('/ganadores/delete/<int:raffle_id>', type='http', auth='user', website=True, methods=['POST'])
+    def raffle_winner_delete(self, raffle_id, **kw):
+        """Elimina un sorteo de la lista de ganadores (solo admin)."""
+        if not request.env.user.has_group('raffle_management.group_raffle_manager'):
+            return request.redirect('/ganadores')
+        raffle = request.env['raffle.raffle'].sudo().browse(raffle_id)
+        if raffle.exists():
+            raffle.winner_partner_id = False
+        return request.redirect('/ganadores')
+
+    @http.route('/sorteo/<int:raffle_id>', type='http', auth='public', website=True, sitemap=True)
+    def raffle_public_view(self, raffle_id, **kw):
+        """Pagina publica de un sorteo finalizado con cuadricula y ticket ganador dorado."""
+        raffle = request.env['raffle.raffle'].sudo().browse(raffle_id)
+        if not raffle.exists() or raffle.state not in ('finished', 'delivered'):
+            return request.redirect('/ganadores')
+        tickets = raffle.ticket_ids.sorted('number')
+        tickets_json = json.dumps([{
+            'id': t.id,
+            'number': t.number,
+            'name': t.name,
+            'state': t.state,
+            'buyer': t.partner_id.display_nickname if t.partner_id else '',
+            'reservation_expiry': False,
+        } for t in tickets])
+        return request.render('raffle_management.raffle_public_view_page', {
+            'raffle': raffle,
+            'raffle_tickets': tickets,
+            'raffle_tickets_json': tickets_json,
+        })
