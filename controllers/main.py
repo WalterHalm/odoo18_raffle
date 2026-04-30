@@ -128,11 +128,25 @@ class RaffleTicketController(http.Controller):
         )
         raffles = Raffle.search(domain, order='create_date desc', limit=per_page, offset=pager['offset'])
         is_admin = request.env.user.has_group('raffle_management.group_raffle_manager')
+
+        MESES = {
+            1: 'enero', 2: 'febrero', 3: 'marzo', 4: 'abril',
+            5: 'mayo', 6: 'junio', 7: 'julio', 8: 'agosto',
+            9: 'septiembre', 10: 'octubre', 11: 'noviembre', 12: 'diciembre',
+        }
+
+        def format_date_es(dt):
+            """Formatea datetime a '15 de abril de 2026'."""
+            if not dt:
+                return ''
+            return '%d de %s de %d' % (dt.day, MESES[dt.month], dt.year)
+
         return request.render('raffle_management.raffle_winners_page', {
             'raffles': raffles,
             'pager': pager,
             'search': search,
             'is_admin': is_admin,
+            'format_date_es': format_date_es,
         })
 
     @http.route('/ganadores/delete/<int:raffle_id>', type='http', auth='user', website=True, methods=['POST'])

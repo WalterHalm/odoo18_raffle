@@ -4,135 +4,104 @@
     <template id="raffle_winners_page" name="Ganadores de Sorteos">
         <t t-call="website.layout">
             <div id="wrap" class="oe_structure">
-                <div class="container py-5">
-
-                    <!-- Header -->
-                    <div class="text-center mb-5">
-                        <h1 class="raffle-winners-title">🏆 Ganadores</h1>
-                        <p class="text-muted fs-5">Conocé a los ganadores de Sorteo Prime</p>
-                    </div>
-
-                    <!-- Buscador -->
-                    <div class="row justify-content-center mb-4">
-                        <div class="col-12 col-md-6">
-                            <form action="/ganadores" method="get">
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white"><i class="fa fa-search text-muted"/></span>
-                                    <input type="text" name="search" class="form-control"
-                                           placeholder="Buscar por producto, ganador o # de ticket..."
-                                           t-att-value="search"/>
-                                    <button class="btn btn-primary" type="submit">Buscar</button>
-                                    <t t-if="search">
-                                        <a href="/ganadores" class="btn btn-outline-secondary" title="Limpiar">
-                                            <i class="fa fa-times"/>
-                                        </a>
-                                    </t>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Sin resultados -->
-                    <div t-if="not raffles" class="text-center py-5">
-                        <i class="fa fa-trophy fa-3x text-muted mb-3 d-block"/>
-                        <p class="text-muted fs-5" t-if="search">
-                            No se encontraron ganadores para "<strong t-out="search"/>".
-                        </p>
-                        <p class="text-muted fs-5" t-else="">
-                            Aún no hay sorteos finalizados. ¡Participá para ser el próximo ganador!
+                <section class="s_title pt40 pb40 o_colored_level" data-name="Título">
+                    <div class="container">
+                        <h1 style="text-align: center;">Ganadores</h1>
+                        <p class="lead text-center text-muted">
+                            Registro histórico de todos nuestros sorteos finalizados
                         </p>
                     </div>
+                </section>
 
-                    <!-- Tarjetas de ganadores -->
-                    <t t-if="raffles">
-                        <div class="raffle-winners-list">
-                            <t t-foreach="raffles" t-as="raffle">
-                                <div class="raffle-winner-card">
-                                    <div class="row g-0 align-items-center">
+                <section class="s_text_block pt0 pb64 o_colored_level" data-name="Section">
+                    <div class="container">
 
-                                        <!-- Fecha -->
-                                        <div class="col-12 col-md-2 text-center raffle-winner-date-col">
-                                            <div class="raffle-winner-date">
-                                                <span class="raffle-winner-day"
-                                                      t-out="raffle.draw_date.strftime('%d') if raffle.draw_date else raffle.create_date.strftime('%d')"/>
-                                                <span class="raffle-winner-month"
-                                                      t-out="raffle.draw_date.strftime('%b %Y') if raffle.draw_date else raffle.create_date.strftime('%b %Y')"/>
-                                            </div>
-                                        </div>
-
-                                        <!-- Imagen producto -->
-                                        <div class="col-12 col-md-2 text-center py-2">
-                                            <img t-if="raffle.product_id.image_128"
-                                                 t-att-src="'/web/image/product.product/%s/image_128' % raffle.product_id.id"
-                                                 class="raffle-winner-img rounded"
-                                                 t-att-alt="raffle.product_id.name"/>
-                                            <div t-else="" class="raffle-winner-img-placeholder rounded">
-                                                <i class="fa fa-gift fa-2x text-muted"/>
-                                            </div>
-                                        </div>
-
-                                        <!-- Descripcion narrativa -->
-                                        <div class="col-12 col-md-8 raffle-winner-body">
-                                            <p class="raffle-winner-text mb-2">
-                                                En el sorteo del producto
-                                                <strong t-out="raffle.product_id.name"/>
-                                                (<t t-out="raffle.name"/>),
-                                                el ticket <strong>#<t t-out="raffle.winner_ticket_id.number"/></strong>
-                                                resultó ganador para
-                                                <strong t-out="raffle.winner_partner_id.display_nickname"/>.
-                                                <t t-if="raffle.state == 'delivered'">
-                                                    <span class="raffle-winner-badge-delivered">
-                                                        🏆 Premio entregado
-                                                    </span>
-                                                </t>
-                                                <t t-else="">
-                                                    <span class="raffle-winner-badge-pending">
-                                                        ⏳ Entrega pendiente
-                                                    </span>
-                                                </t>
-                                            </p>
-
-                                            <div class="d-flex flex-wrap align-items-center">
-                                                <a t-attf-href="/sorteo/#{raffle.id}"
-                                                   class="raffle-winner-link">
-                                                    Ver sorteo completo →
-                                                </a>
-
-                                                <!-- Compartir en redes -->
-                                                <div class="raffle-share-buttons ms-auto">
-                                                    <span class="raffle-share-label">Compartir:</span>
-                                                    <a t-attf-href="https://wa.me/?text=🏆 {{ raffle.winner_partner_id.display_nickname }} ganó {{ raffle.product_id.name }} en Sorteo Prime! Ver: https://sorteoprime.com/sorteo/{{ raffle.id }}"
-                                                       target="_blank" rel="noopener" class="raffle-share-btn raffle-share-wa" title="Compartir en WhatsApp">
-                                                        <i class="fa fa-whatsapp"/>
-                                                    </a>
-                                                    <a t-attf-href="https://www.facebook.com/sharer/sharer.php?u=https://sorteoprime.com/sorteo/{{ raffle.id }}"
-                                                       target="_blank" rel="noopener" class="raffle-share-btn raffle-share-fb" title="Compartir en Facebook">
-                                                        <i class="fa fa-facebook"/>
-                                                    </a>
-                                                    <a href="https://www.youtube.com/@SorteoPrime"
-                                                       target="_blank" rel="noopener" class="raffle-share-btn raffle-share-yt" title="YouTube">
-                                                        <i class="fa fa-youtube-play"/>
-                                                    </a>
-                                                    <a href="https://www.tiktok.com/@sorteoprime"
-                                                       target="_blank" rel="noopener" class="raffle-share-btn raffle-share-tt" title="TikTok">
-                                                        <i class="fa fa-music"/>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-
+                        <!-- Buscador -->
+                        <div class="row justify-content-center mb-4">
+                            <div class="col-12 col-md-6">
+                                <form action="/ganadores" method="get">
+                                    <div class="input-group">
+                                        <input type="text" name="search" class="form-control"
+                                               placeholder="Buscar por producto, ganador o # de ticket..."
+                                               t-att-value="search"/>
+                                        <button class="btn btn-primary" type="submit">Buscar</button>
+                                        <t t-if="search">
+                                            <a href="/ganadores" class="btn btn-outline-secondary" title="Limpiar">
+                                                <i class="fa fa-times"/>
+                                            </a>
+                                        </t>
                                     </div>
-                                </div>
-                            </t>
+                                </form>
+                            </div>
                         </div>
 
-                        <!-- Paginacion -->
-                        <div class="d-flex justify-content-center mt-4">
-                            <t t-call="website.pager"/>
+                        <div class="s_hr pt8 pb16" data-name="Separator">
+                            <hr class="w-100 mx-auto"/>
                         </div>
-                    </t>
 
-                </div>
+                        <!-- Sin resultados -->
+                        <div t-if="not raffles" class="text-center py-5">
+                            <p class="text-muted" t-if="search">
+                                No se encontraron ganadores para "<strong t-out="search"/>".
+                            </p>
+                            <p class="text-muted" t-else="">
+                                Aún no hay sorteos finalizados. ¡Participá para ser el próximo ganador!
+                            </p>
+                        </div>
+
+                        <!-- Timeline de ganadores -->
+                        <t t-if="raffles">
+                            <div class="raffle-timeline">
+                                <t t-foreach="raffles" t-as="raffle">
+                                    <div class="raffle-timeline-item">
+                                        <div class="raffle-timeline-date">
+                                            <t t-out="format_date_es(raffle.draw_date or raffle.create_date)"/>
+                                        </div>
+                                        <p>
+                                            En el sorteo del producto
+                                            <strong t-out="raffle.product_id.name"/>
+                                            (<a t-attf-href="/sorteo/#{raffle.id}"><t t-out="raffle.name"/></a>),
+                                            el ticket <strong>#<t t-out="raffle.winner_ticket_id.number"/></strong>
+                                            resultó ganador para
+                                            <strong t-out="raffle.winner_partner_id.display_nickname"/>.
+                                            <t t-if="raffle.state == 'delivered'">
+                                                🏆 Premio entregado.
+                                            </t>
+                                            <t t-else="">
+                                                ⏳ Entrega pendiente.
+                                            </t>
+                                            <a t-attf-href="/sorteo/#{raffle.id}">Ver sorteo completo →</a>
+                                        </p>
+                                        <div class="raffle-share-buttons">
+                                            <a t-attf-href="https://wa.me/?text=🏆 {{ raffle.winner_partner_id.display_nickname }} ganó {{ raffle.product_id.name }} en Sorteo Prime! Ver: https://sorteoprime.com/sorteo/{{ raffle.id }}"
+                                               target="_blank" rel="noopener" class="raffle-share-btn raffle-share-wa" title="WhatsApp">
+                                                <i class="fa fa-whatsapp"/>
+                                            </a>
+                                            <a t-attf-href="https://www.facebook.com/sharer/sharer.php?u=https://sorteoprime.com/sorteo/{{ raffle.id }}"
+                                               target="_blank" rel="noopener" class="raffle-share-btn raffle-share-fb" title="Facebook">
+                                                <i class="fa fa-facebook"/>
+                                            </a>
+                                            <a href="https://www.youtube.com/@SorteoPrime"
+                                               target="_blank" rel="noopener" class="raffle-share-btn raffle-share-yt" title="YouTube">
+                                                <i class="fa fa-youtube-play"/>
+                                            </a>
+                                            <a href="https://www.tiktok.com/@sorteoprime"
+                                               target="_blank" rel="noopener" class="raffle-share-btn raffle-share-tt" title="TikTok">
+                                                <i class="fa fa-music"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+
+                            <!-- Paginacion -->
+                            <div class="d-flex justify-content-center mt-4">
+                                <t t-call="website.pager"/>
+                            </div>
+                        </t>
+
+                    </div>
+                </section>
             </div>
         </t>
     </template>
@@ -141,94 +110,96 @@
     <template id="raffle_public_view_page" name="Vista Pública del Sorteo">
         <t t-call="website.layout">
             <div id="wrap" class="oe_structure">
-                <div class="container py-5">
+                <section class="s_text_block pt24 pb40 o_colored_level" data-name="Section">
+                    <div class="container">
 
-                    <!-- Breadcrumb -->
-                    <nav aria-label="breadcrumb" class="mb-4">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="/ganadores">Ganadores</a></li>
-                            <li class="breadcrumb-item active" t-out="raffle.name"/>
-                        </ol>
-                    </nav>
+                        <!-- Breadcrumb -->
+                        <nav aria-label="breadcrumb" class="mb-4">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/ganadores">Ganadores</a></li>
+                                <li class="breadcrumb-item active" t-out="raffle.name"/>
+                            </ol>
+                        </nav>
 
-                    <!-- Info del sorteo -->
-                    <div class="text-center mb-4">
-                        <h2>
-                            <t t-out="raffle.product_id.name"/>
-                            <small class="text-muted">(<t t-out="raffle.name"/>)</small>
-                        </h2>
-                        <p class="fs-5">
-                            🏆 Ganador:
-                            <strong t-out="raffle.winner_partner_id.display_nickname"/>
-                            — Ticket <strong>#<t t-out="raffle.winner_ticket_id.number"/></strong>
-                        </p>
-                        <t t-if="raffle.state == 'delivered'">
-                            <span class="raffle-winner-badge-delivered">🏆 Premio entregado</span>
-                        </t>
-                    </div>
-
-                    <!-- Imagen del producto -->
-                    <div class="text-center mb-4" t-if="raffle.product_id.image_512">
-                        <img t-att-src="'/web/image/product.product/%s/image_512' % raffle.product_id.id"
-                             class="rounded shadow-sm" style="max-height: 250px; object-fit: contain;"
-                             t-att-alt="raffle.product_id.name"/>
-                    </div>
-
-                    <!-- Leyenda de colores -->
-                    <div class="d-flex justify-content-center gap-3 mb-3">
-                        <span><span class="raffle-ticket-sample raffle-available"/> Disponible</span>
-                        <span><span class="raffle-ticket-sample raffle-sold"/> Vendido</span>
-                        <span><span class="raffle-ticket-sample raffle-winner"/> Ganador</span>
-                    </div>
-
-                    <!-- Cuadricula de tickets (solo visual, sin interaccion) -->
-                    <div class="raffle-grid-container"
-                         t-att-data-tickets="raffle_tickets_json"
-                         t-att-data-total="raffle.total_tickets"
-                         t-att-data-raffle-id="raffle.id"
-                         data-readonly="1">
-                        <div class="raffle-grid">
-                            <t t-foreach="raffle_tickets" t-as="ticket">
-                                <div t-attf-class="raffle-ticket raffle-#{ticket.state}"
-                                     t-att-data-ticket-id="ticket.id"
-                                     t-att-data-ticket-number="ticket.number"
-                                     t-att-data-ticket-state="ticket.state"
-                                     t-att-data-buyer="ticket.partner_id.display_nickname if ticket.partner_id else ''"
-                                     t-att-title="'%s - %s' % (ticket.name, ticket.partner_id.display_nickname) if ticket.partner_id else ticket.name"
-                                     style="cursor: default;">
-                                    <span class="raffle-ticket-number" t-out="ticket.number"/>
-                                </div>
+                        <!-- Info del sorteo -->
+                        <div class="text-center mb-4">
+                            <h2>
+                                <t t-out="raffle.product_id.name"/>
+                                <small class="text-muted">(<t t-out="raffle.name"/>)</small>
+                            </h2>
+                            <p class="lead">
+                                🏆 Ganador:
+                                <strong t-out="raffle.winner_partner_id.display_nickname"/>
+                                — Ticket <strong>#<t t-out="raffle.winner_ticket_id.number"/></strong>
+                            </p>
+                            <t t-if="raffle.state == 'delivered'">
+                                <span class="badge bg-success">🏆 Premio entregado</span>
                             </t>
                         </div>
-                    </div>
 
-                    <!-- Compartir y volver -->
-                    <div class="text-center mt-4">
-                        <p class="text-muted mb-2">Compartí este sorteo</p>
-                        <div class="raffle-share-buttons justify-content-center mb-3">
-                            <a t-attf-href="https://wa.me/?text=🏆 {{ raffle.winner_partner_id.display_nickname }} ganó {{ raffle.product_id.name }} en Sorteo Prime! Ver: https://sorteoprime.com/sorteo/{{ raffle.id }}"
-                               target="_blank" rel="noopener" class="raffle-share-btn raffle-share-wa raffle-share-btn-lg" title="Compartir en WhatsApp">
-                                <i class="fa fa-whatsapp"/>
-                            </a>
-                            <a t-attf-href="https://www.facebook.com/sharer/sharer.php?u=https://sorteoprime.com/sorteo/{{ raffle.id }}"
-                               target="_blank" rel="noopener" class="raffle-share-btn raffle-share-fb raffle-share-btn-lg" title="Compartir en Facebook">
-                                <i class="fa fa-facebook"/>
-                            </a>
-                            <a href="https://www.youtube.com/@SorteoPrime"
-                               target="_blank" rel="noopener" class="raffle-share-btn raffle-share-yt raffle-share-btn-lg" title="YouTube">
-                                <i class="fa fa-youtube-play"/>
-                            </a>
-                            <a href="https://www.tiktok.com/@sorteoprime"
-                               target="_blank" rel="noopener" class="raffle-share-btn raffle-share-tt raffle-share-btn-lg" title="TikTok">
-                                <i class="fa fa-music"/>
+                        <!-- Imagen del producto -->
+                        <div class="text-center mb-4" t-if="raffle.product_id.image_512">
+                            <img t-att-src="'/web/image/product.product/%s/image_512' % raffle.product_id.id"
+                                 class="rounded shadow-sm" style="max-height: 250px; object-fit: contain;"
+                                 t-att-alt="raffle.product_id.name"/>
+                        </div>
+
+                        <!-- Leyenda de colores -->
+                        <div class="d-flex justify-content-center gap-3 mb-3">
+                            <span><span class="raffle-ticket-sample raffle-available"/> Disponible</span>
+                            <span><span class="raffle-ticket-sample raffle-sold"/> Vendido</span>
+                            <span><span class="raffle-ticket-sample raffle-winner"/> Ganador</span>
+                        </div>
+
+                        <!-- Cuadricula de tickets (solo visual, sin interaccion) -->
+                        <div class="raffle-grid-container"
+                             t-att-data-tickets="raffle_tickets_json"
+                             t-att-data-total="raffle.total_tickets"
+                             t-att-data-raffle-id="raffle.id"
+                             data-readonly="1">
+                            <div class="raffle-grid">
+                                <t t-foreach="raffle_tickets" t-as="ticket">
+                                    <div t-attf-class="raffle-ticket raffle-#{ticket.state}"
+                                         t-att-data-ticket-id="ticket.id"
+                                         t-att-data-ticket-number="ticket.number"
+                                         t-att-data-ticket-state="ticket.state"
+                                         t-att-data-buyer="ticket.partner_id.display_nickname if ticket.partner_id else ''"
+                                         t-att-title="'%s - %s' % (ticket.name, ticket.partner_id.display_nickname) if ticket.partner_id else ticket.name"
+                                         style="cursor: default;">
+                                        <span class="raffle-ticket-number" t-out="ticket.number"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Compartir y volver -->
+                        <div class="text-center mt-4">
+                            <p class="text-muted mb-2">Compartí este sorteo</p>
+                            <div class="raffle-share-buttons justify-content-center mb-3">
+                                <a t-attf-href="https://wa.me/?text=🏆 {{ raffle.winner_partner_id.display_nickname }} ganó {{ raffle.product_id.name }} en Sorteo Prime! Ver: https://sorteoprime.com/sorteo/{{ raffle.id }}"
+                                   target="_blank" rel="noopener" class="raffle-share-btn raffle-share-wa raffle-share-btn-lg" title="WhatsApp">
+                                    <i class="fa fa-whatsapp"/>
+                                </a>
+                                <a t-attf-href="https://www.facebook.com/sharer/sharer.php?u=https://sorteoprime.com/sorteo/{{ raffle.id }}"
+                                   target="_blank" rel="noopener" class="raffle-share-btn raffle-share-fb raffle-share-btn-lg" title="Facebook">
+                                    <i class="fa fa-facebook"/>
+                                </a>
+                                <a href="https://www.youtube.com/@SorteoPrime"
+                                   target="_blank" rel="noopener" class="raffle-share-btn raffle-share-yt raffle-share-btn-lg" title="YouTube">
+                                    <i class="fa fa-youtube-play"/>
+                                </a>
+                                <a href="https://www.tiktok.com/@sorteoprime"
+                                   target="_blank" rel="noopener" class="raffle-share-btn raffle-share-tt raffle-share-btn-lg" title="TikTok">
+                                    <i class="fa fa-music"/>
+                                </a>
+                            </div>
+                            <a href="/ganadores" class="btn btn-outline-primary">
+                                <i class="fa fa-arrow-left"/> Volver a Ganadores
                             </a>
                         </div>
-                        <a href="/ganadores" class="btn btn-outline-primary">
-                            <i class="fa fa-arrow-left"/> Volver a Ganadores
-                        </a>
-                    </div>
 
-                </div>
+                    </div>
+                </section>
             </div>
         </t>
     </template>
