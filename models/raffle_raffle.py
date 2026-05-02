@@ -247,8 +247,6 @@ class RaffleRaffle(models.Model):
     def action_execute_draw(self):
         """Ejecutar el sorteo aleatorio usando la semilla acumulada."""
         for rec in self:
-            if rec.state not in ('completed', 'draw_pending'):
-                raise UserError(_('El sorteo debe estar Completado o Pendiente para ejecutarse.'))
             sold_tickets = rec.ticket_ids.filtered(lambda t: t.state == 'sold')
             if not sold_tickets:
                 raise UserError(_('No hay tickets vendidos para realizar el sorteo.'))

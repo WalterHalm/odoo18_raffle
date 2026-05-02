@@ -15,6 +15,10 @@
                             type="object" class="btn-primary"
                             invisible="state not in ('completed', 'draw_pending')"
                             groups="raffle_management.group_raffle_manager"/>
+                    <button name="action_open_draw_wizard" string="Ejecutar Sorteo (Prueba)"
+                            type="object" class="btn-warning"
+                            invisible="state != 'on_sale'"
+                            groups="raffle_management.group_raffle_manager"/>
                     <button name="action_mark_delivered" string="Marcar Entregado"
                             type="object" class="btn-primary"
                             invisible="state != 'finished'"
