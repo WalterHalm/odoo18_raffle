@@ -76,6 +76,20 @@ class SaleOrder(models.Model):
     sea una linea separada en el carrito y se vendan al completar checkout."""
     _inherit = 'sale.order'
 
+    raffle_id = fields.Many2one(
+        'raffle.raffle',
+        string='Sorteo',
+        compute='_compute_raffle_id',
+        store=True,
+    )
+
+    @api.depends('order_line.raffle_ticket_id')
+    def _compute_raffle_id(self):
+        """Obtiene el sorteo desde la primera linea que tenga ticket de rifa."""
+        for order in self:
+            ticket_line = order.order_line.filtered('raffle_ticket_id')[:1]
+            order.raffle_id = ticket_line.raffle_ticket_id.raffle_id if ticket_line else False
+
     def action_quotation_sent(self):
         """Override: al enviar la cotizacion (checkout con pago pendiente),
         marcar los tickets de rifa como vendidos para que no se liberen."""

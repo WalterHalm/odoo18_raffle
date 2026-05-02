@@ -245,11 +245,7 @@ class RaffleRaffle(models.Model):
         }
 
     def action_execute_draw(self):
-        """Ejecutar el sorteo aleatorio usando la semilla acumulada.
-        Requerimiento: cada venta genera un valor aleatorio que se acumula.
-        La sumatoria se usa como semilla para seleccionar el ganador.
-        Esto garantiza que el resultado es impredecible hasta la última compra
-        y reproducible con la misma semilla (auditable)."""
+        """Ejecutar el sorteo aleatorio usando la semilla acumulada."""
         for rec in self:
             if rec.state not in ('completed', 'draw_pending'):
                 raise UserError(_('El sorteo debe estar Completado o Pendiente para ejecutarse.'))
@@ -265,10 +261,7 @@ class RaffleRaffle(models.Model):
                 'winner_partner_id': winner.partner_id.id,
                 'state': 'finished',
             })
-            # Archivar producto ticket para que desaparezca de la tienda
-            if rec.ticket_product_id:
-                rec.ticket_product_id.product_tmpl_id.active = False
-                rec.ticket_product_id.active = False
+            rec._archive_ticket_product()
             rec._send_draw_emails()
 
     def _on_all_tickets_sold(self):
@@ -298,6 +291,7 @@ class RaffleRaffle(models.Model):
                 raffle.action_execute_draw()
             else:
                 raffle._compute_draw_date()
+                raffle._archive_ticket_product()
                 raffle.state = 'completed'
 
     def action_mark_delivered(self):
@@ -313,20 +307,21 @@ class RaffleRaffle(models.Model):
 
     def action_cancel(self):
         """Cancelar sorteo: libera stock reservado y desactiva producto ticket.
-        Si el stock ya fue movido (done), lo devuelve a ubicación principal.
-        Requerimiento: si no hay ganador, se puede reprogramar o cancelar."""
+        Solo permitido en estados draft y on_sale. Sorteos con transacciones
+        completadas (completed, finished, delivered) no se pueden cancelar."""
         for rec in self:
-            if rec.state in ('delivered',):
-                raise UserError(_('No se puede cancelar un sorteo ya entregado.'))
+            if rec.state in ('completed', 'finished', 'delivered'):
+                raise UserError(
+                    _('No se puede cancelar el sorteo %s porque tiene transacciones. '
+                      'Los sorteos completados o finalizados solo se ocultan de la tienda.', rec.name)
+                )
             if rec.stock_move_reserve_id and rec.stock_move_reserve_id.state != 'done':
                 rec.stock_move_reserve_id._action_cancel()
             elif rec.stock_move_reserve_id and rec.stock_move_reserve_id.state == 'done':
                 rec._return_stock_to_origin()
             rec.ticket_ids.filtered(lambda t: t.state != 'cancelled').write({'state': 'cancelled'})
             if rec.ticket_product_id:
-                # Archivar producto y su template para que desaparezca de la tienda
-                rec.ticket_product_id.product_tmpl_id.active = False
-                rec.ticket_product_id.active = False
+                rec._archive_ticket_product()
             rec.state = 'cancelled'
 
     def action_reset_to_draft(self):
@@ -453,6 +448,13 @@ class RaffleRaffle(models.Model):
         self.env['raffle.ticket'].create(vals_list)
 
     # --- Producto Virtual para Tienda ---
+
+    def _archive_ticket_product(self):
+        """Archiva el producto ticket para que desaparezca de la tienda."""
+        self.ensure_one()
+        if self.ticket_product_id:
+            self.ticket_product_id.product_tmpl_id.active = False
+            self.ticket_product_id.active = False
 
     def _create_ticket_product(self):
         """Crea un producto tipo servicio 'Ticket - [Producto]' para vender en la tienda.

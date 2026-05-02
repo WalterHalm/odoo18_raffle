@@ -54,13 +54,14 @@
                             <div class="raffle-timeline">
                                 <t t-foreach="raffles" t-as="raffle">
                                     <div class="raffle-timeline-item">
-                                        <div class="raffle-timeline-date">
-                                            <t t-out="format_date_es(raffle.draw_date or raffle.create_date)"/>
-                                        </div>
-                                        <p>
+                                        <p class="mb-1">
+                                            <span class="raffle-timeline-date">
+                                                <t t-out="format_date_es(raffle.draw_date or raffle.create_date)"/>
+                                            </span>
+                                            —
                                             En el sorteo del producto
                                             <strong t-out="raffle.product_id.name"/>
-                                            (<a t-attf-href="/sorteo/#{raffle.id}"><t t-out="raffle.name"/></a>),
+                                            (<t t-out="raffle.name"/>),
                                             el ticket <strong>#<t t-out="raffle.winner_ticket_id.number"/></strong>
                                             resultó ganador para
                                             <strong t-out="raffle.winner_partner_id.display_nickname"/>.
