@@ -1,0 +1,11 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M8 20C8 17.7909 9.79086 16 12 16H44C46.2091 16 48 17.7909 48 20V24C45.7909 24 44 25.7909 44 28C44 30.2091 45.7909 32 48 32V36C48 38.2091 46.2091 40 44 40H12C9.79086 40 8 38.2091 8 36V32C10.2091 32 12 30.2091 12 28C12 25.7909 10.2091 24 8 24V20Z" fill="#C1DBF6"/>
+<path d="M12 20C12 17.7909 13.7909 16 16 16H48C50.2091 16 52 17.7909 52 20V24C49.7909 24 48 25.7909 48 28C48 30.2091 49.7909 32 52 32V36C52 38.2091 50.2091 40 48 40H16C13.7909 40 12 38.2091 12 36V32C14.2091 32 16 30.2091 16 28C16 25.7909 14.2091 24 12 24V20Z" fill="white" stroke="#374874" stroke-width="1.5"/>
+<path d="M36 16V40" stroke="#374874" stroke-width="1.5" stroke-dasharray="3 3"/>
+<circle cx="26" cy="28" r="5" fill="#FBDBD0" stroke="#374874" stroke-width="1.2"/>
+<path d="M24.5 28L25.5 29L27.5 27" stroke="#374874" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="26" font-family="Arial" font-size="7" font-weight="bold" fill="#374874">#</text>
+<text x="40" y="34" font-family="Arial" font-size="6" fill="#374874">42</text>
+<path d="M52 44L56 48L52 52" stroke="#374874" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M56 48H44" stroke="#374874" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

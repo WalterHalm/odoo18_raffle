@@ -27,6 +27,29 @@ class WebsiteSaleRaffle(WebsiteSale):
             } for t in tickets])
         return values
 
+    def _get_mandatory_billing_address_fields(self, country_sudo):
+        """Para carritos de solo rifas, reducir campos obligatorios de facturación.
+        Solo se exige 'name' ya que los tickets son servicios digitales."""
+        fields = super()._get_mandatory_billing_address_fields(country_sudo)
+        order = request.website.sale_get_order()
+        if order and self._is_raffle_only_cart(order):
+            return {'name'}
+        return fields
+
+    def _get_mandatory_delivery_address_fields(self, country_sudo):
+        """Para carritos de solo rifas, no se requiere dirección de envío."""
+        fields = super()._get_mandatory_delivery_address_fields(country_sudo)
+        order = request.website.sale_get_order()
+        if order and self._is_raffle_only_cart(order):
+            return {'name'}
+        return fields
+
+    def _is_raffle_only_cart(self, order):
+        """Verifica si el carrito contiene solo tickets de rifa."""
+        if not order or not order.order_line:
+            return False
+        return all(line.raffle_ticket_id for line in order.order_line)
+
 
 class RaffleTicketController(http.Controller):
     """Controller separado para las rutas JSON de tickets de rifa.
@@ -71,16 +94,28 @@ class RaffleTicketController(http.Controller):
             'cart_quantity': sale_order.cart_quantity,
             'reservation_minutes': 5,
             'reservation_expiry': (ticket.reservation_expiry.isoformat() + 'Z') if ticket.reservation_expiry else False,
+            'my_ticket_numbers': sale_order.order_line.filtered(
+                lambda l: l.raffle_ticket_id
+            ).mapped('raffle_ticket_id.number'),
         }
 
     @http.route('/shop/raffle/ticket_status', type='json', auth='public', website=True)
     def raffle_ticket_status(self, raffle_id, **kwargs):
-        """Devuelve el estado actual de todos los tickets de un sorteo.
-        Usado para refrescar la cuadricula cuando expira una reserva."""
+        """Devuelve el estado actual de todos los tickets de un sorteo
+        + los IDs de tickets que están en el carrito del usuario actual."""
         raffle = request.env['raffle.raffle'].sudo().browse(int(raffle_id))
         if not raffle.exists():
             return {'error': 'Sorteo no encontrado'}
         tickets = raffle.ticket_ids.sorted('number')
+
+        # Obtener tickets del carrito del usuario actual
+        my_ticket_ids = []
+        sale_order = request.website.sale_get_order()
+        if sale_order:
+            my_ticket_ids = sale_order.order_line.filtered(
+                lambda l: l.raffle_ticket_id
+            ).mapped('raffle_ticket_id.id')
+
         return {
             'tickets': [{
                 'id': t.id,
@@ -89,6 +124,36 @@ class RaffleTicketController(http.Controller):
                 'buyer': t.partner_id.display_nickname if t.partner_id else '',
                 'reservation_expiry': (t.reservation_expiry.isoformat() + 'Z') if t.reservation_expiry else False,
             } for t in tickets],
+            'my_ticket_ids': my_ticket_ids,
+        }
+
+    @http.route('/shop/raffle/remove_ticket', type='json', auth='user', website=True)
+    def raffle_remove_ticket_from_cart(self, ticket_id, **kwargs):
+        """Quita un ticket reservado del carrito y libera la reserva.
+        Solo funciona si el ticket está en el carrito del usuario actual."""
+        ticket = request.env['raffle.ticket'].sudo().browse(int(ticket_id))
+        if not ticket.exists() or ticket.state != 'reserved':
+            return {'error': _('Este ticket no está reservado.')}
+
+        sale_order = request.website.sale_get_order()
+        if not sale_order:
+            return {'error': _('No hay carrito activo.')}
+
+        # Buscar la línea del carrito con este ticket
+        line = sale_order.order_line.filtered(
+            lambda l: l.raffle_ticket_id.id == ticket.id
+        )
+        if not line:
+            return {'error': _('Este ticket no está en tu carrito.')}
+
+        line.unlink()
+
+        return {
+            'success': True,
+            'cart_quantity': sale_order.cart_quantity,
+            'my_ticket_numbers': sale_order.order_line.filtered(
+                lambda l: l.raffle_ticket_id
+            ).mapped('raffle_ticket_id.number'),
         }
 
     @http.route(['/ganadores', '/ganadores/page/<int:page>'], type='http', auth='public', website=True, sitemap=True)

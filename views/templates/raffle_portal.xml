@@ -9,7 +9,7 @@
         </xpath>
         <div id="portal_client_category" position="inside">
             <t t-call="portal.portal_docs_entry">
-                <t t-set="icon" t-value="'/raffle_management/static/description/icon.png'"/>
+                <t t-set="icon" t-value="'/raffle_management/static/src/img/ticket.svg'"/>
                 <t t-set="title">Mis Tickets de Rifa</t>
                 <t t-set="url" t-value="'/my/raffle/tickets'"/>
                 <t t-set="text">Ver tus tickets comprados, premios y sorteos</t>

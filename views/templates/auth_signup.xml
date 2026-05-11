@@ -3,6 +3,15 @@
     <!-- Extensión del formulario de registro con campos WhatsApp, DNI, Nickname -->
     <template id="raffle_signup_fields" inherit_id="auth_signup.fields"
               name="Campos de Registro para Rifas">
+        <!-- Ocultar campo nombre (se auto-genera con nickname o DNI) -->
+        <xpath expr="//div[hasclass('field-name')]" position="attributes">
+            <attribute name="class">mb-3 field-name d-none</attribute>
+        </xpath>
+        <!-- Quitar required del input name para que el navegador no bloquee -->
+        <xpath expr="//input[@name='name']" position="attributes">
+            <attribute name="required"></attribute>
+        </xpath>
+
         <!-- WhatsApp y DNI después del nombre -->
         <xpath expr="//div[hasclass('field-name')]" position="after">
             <div class="mb-3 field-whatsapp_number">

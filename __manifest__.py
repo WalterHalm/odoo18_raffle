@@ -43,6 +43,7 @@
         'views/templates/raffle_portal.xml',
         'views/templates/raffle_winners.xml',
         'views/templates/auth_signup.xml',
+        'views/templates/raffle_checkout.xml',
         # Wizards
         'wizard/raffle_draw_wizard.xml',
     ],

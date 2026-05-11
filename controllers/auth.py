@@ -11,14 +11,19 @@ class AuthSignupHome(AuthSignupHome):
     """Extensión mínima: solo valida campos custom y setea contraseña = DNI."""
 
     def _prepare_signup_values(self, qcontext):
-        """Valida WhatsApp/DNI y setea contraseña = DNI antes del signup."""
+        """Valida WhatsApp/DNI, auto-genera nombre y setea contraseña = DNI."""
         dni = qcontext.get('dni_number', '').strip()
         whatsapp = qcontext.get('whatsapp_number', '').strip()
+        nickname = qcontext.get('nickname', '').strip()
 
         if not whatsapp:
             raise UserError(_('El número de WhatsApp es obligatorio.'))
         if not dni:
             raise UserError(_('El DNI es obligatorio.'))
+
+        # Auto-generar nombre: nickname si existe, sino DNI
+        if not qcontext.get('name') or not qcontext['name'].strip():
+            qcontext['name'] = nickname if nickname else dni
 
         # Contraseña por defecto = DNI
         if not qcontext.get('password'):
@@ -32,7 +37,6 @@ class AuthSignupHome(AuthSignupHome):
             values['whatsapp_number'] = whatsapp
         if dni:
             values['dni_number'] = dni
-        nickname = qcontext.get('nickname', '').strip()
         if nickname:
             values['nickname'] = nickname
 

@@ -53,7 +53,8 @@
                     <!-- Cuadrícula de tickets -->
                     <div class="raffle-grid-container" t-att-data-tickets="raffle_tickets_json"
                          t-att-data-total="raffle.total_tickets"
-                         t-att-data-raffle-id="raffle.id">
+                         t-att-data-raffle-id="raffle.id"
+                         t-att-data-is-public="'1' if request.env.user._is_public() else '0'">
                         <div class="raffle-grid">
                             <t t-foreach="raffle_tickets" t-as="ticket">
                                 <div t-attf-class="raffle-ticket raffle-#{ticket.state}"

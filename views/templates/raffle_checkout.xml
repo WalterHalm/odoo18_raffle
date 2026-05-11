@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Ocultar campo "Nombre de la empresa" del formulario de dirección -->
+    <template id="raffle_hide_company_name"
+              inherit_id="website_sale.address"
+              name="Ocultar Empresa en Checkout">
+        <xpath expr="//div[@id='company_name_div']" position="attributes">
+            <attribute name="class">col-lg-6 mb-2 d-none</attribute>
+        </xpath>
+    </template>
+</odoo>

@@ -14,4 +14,13 @@
             </t>
         </xpath>
     </template>
+
+    <!-- Ocultar selector de cantidad para tickets de rifa -->
+    <template id="cart_line_raffle_hide_qty"
+              inherit_id="website_sale.cart_lines"
+              name="Ocultar Cantidad Ticket Rifa">
+        <xpath expr="//div[@name='website_sale_cart_line_quantity']" position="attributes">
+            <attribute name="t-attf-class">css_quantity input-group mb-2 #{line.raffle_ticket_id and 'd-none' or ''}</attribute>
+        </xpath>
+    </template>
 </odoo>
