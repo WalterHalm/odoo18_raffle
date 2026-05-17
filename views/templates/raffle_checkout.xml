@@ -8,4 +8,17 @@
             <attribute name="class">col-lg-6 mb-2 d-none</attribute>
         </xpath>
     </template>
+
+    <!-- Agregar botón "Continuar comprando" en la página de pago -->
+    <template id="raffle_payment_continue_shopping"
+              inherit_id="website_sale.payment"
+              name="Botón Continuar Comprando en Pago">
+        <xpath expr="//div[@id='address_on_payment']" position="after">
+            <div class="text-center mb-3">
+                <a href="/shop" class="btn btn-outline-secondary">
+                    <i class="fa fa-arrow-left me-1"/> Continuar comprando
+                </a>
+            </div>
+        </xpath>
+    </template>
 </odoo>
