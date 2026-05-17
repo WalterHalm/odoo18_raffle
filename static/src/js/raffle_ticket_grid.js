@@ -34,8 +34,6 @@ publicWidget.registry.RaffleTicketGrid = publicWidget.Widget.extend({
             }
 
             // Si vuelve del login con un ticket pendiente, reservar y pagar
-            this._processPendingTicket();
-
             this._refreshInterval = setInterval(() => this._refreshGrid(), 30000);
         }
 
@@ -147,11 +145,9 @@ publicWidget.registry.RaffleTicketGrid = publicWidget.Widget.extend({
         const ticketId = ticketEl.dataset.ticketId;
         const ticketNumber = ticketEl.dataset.ticketNumber;
 
-        // Si no está logueado, redirigir a login/registro
+        // Si no está logueado, redirigir a login con redirect a reserva directa
         if (this.isPublic) {
-            // Guardar ticket elegido en sessionStorage para después del login
-            sessionStorage.setItem('raffle_pending_ticket', ticketId);
-            window.location.href = '/web/login?redirect=' + encodeURIComponent(window.location.pathname);
+            window.location.href = '/web/login?redirect=' + encodeURIComponent('/shop/raffle/reserve_and_pay/' + ticketId);
             return;
         }
 
@@ -282,21 +278,6 @@ publicWidget.registry.RaffleTicketGrid = publicWidget.Widget.extend({
                 Ticket #${num} es el <strong>ganador</strong>
             </span>`;
         }
-    },
-    _processPendingTicket: async function () {
-        /* Si el usuario volvió del login/registro con un ticket pendiente,
-           lo reserva automáticamente y redirige al pago. */
-        const pendingTicketId = sessionStorage.getItem('raffle_pending_ticket');
-        if (!pendingTicketId || this.isPublic) return;
-
-        sessionStorage.removeItem('raffle_pending_ticket');
-
-        const ticketEl = this.el.querySelector(
-            `.raffle-ticket[data-ticket-id="${pendingTicketId}"]`
-        );
-        if (!ticketEl || ticketEl.dataset.ticketState !== 'available') return;
-
-        await this._reserveAndPay(ticketEl, pendingTicketId, ticketEl.dataset.ticketNumber);
     },
 });
 

@@ -127,6 +127,33 @@ class RaffleTicketController(http.Controller):
             'my_ticket_ids': my_ticket_ids,
         }
 
+    @http.route('/shop/raffle/reserve_and_pay/<int:ticket_id>', type='http', auth='user', website=True)
+    def raffle_reserve_and_pay(self, ticket_id, **kwargs):
+        """Ruta HTTP que reserva un ticket y redirige al pago.
+        Usada como redirect después del login/registro."""
+        ticket = request.env['raffle.ticket'].sudo().browse(ticket_id)
+        if not ticket.exists() or ticket.state != 'available':
+            return request.redirect('/shop')
+
+        raffle = ticket.raffle_id
+        product = raffle.ticket_product_id
+        if not product:
+            return request.redirect('/shop')
+
+        sale_order = request.website.sale_get_order(force_create=True)
+
+        # Reservar ticket
+        partner_id = request.env.user.partner_id.id
+        ticket.action_reserve(partner_id=partner_id, minutes=5)
+
+        # Agregar al carrito
+        order_line = sale_order._cart_update(product_id=product.id, add_qty=1)
+        if order_line and order_line.get('line_id'):
+            line = request.env['sale.order.line'].sudo().browse(order_line['line_id'])
+            line.raffle_ticket_id = ticket.id
+
+        return request.redirect('/shop/checkout?try_skip_step=true')
+
     @http.route('/shop/raffle/remove_ticket', type='json', auth='user', website=True)
     def raffle_remove_ticket_from_cart(self, ticket_id, **kwargs):
         """Quita un ticket reservado del carrito y libera la reserva.
