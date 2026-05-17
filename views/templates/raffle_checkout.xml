@@ -13,9 +13,9 @@
     <template id="raffle_payment_continue_shopping"
               inherit_id="website_sale.payment"
               name="Botón Continuar Comprando en Pago">
-        <xpath expr="//div[@id='address_on_payment']" position="after">
-            <div class="text-center mb-3">
-                <a href="/shop" class="btn btn-outline-secondary">
+        <xpath expr="//div[@id='o_wsale_total_accordion_item']" position="inside">
+            <div class="text-center mt-3">
+                <a href="/shop" class="btn btn-outline-secondary w-100">
                     <i class="fa fa-arrow-left me-1"/> Continuar comprando
                 </a>
             </div>
