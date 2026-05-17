@@ -33,7 +33,7 @@ publicWidget.registry.RaffleTicketGrid = publicWidget.Widget.extend({
                 }
             }
 
-            // Si vuelve del login con un ticket pendiente, reservar y pagar
+            // Refrescar cuadrícula cada 30 segundos
             this._refreshInterval = setInterval(() => this._refreshGrid(), 30000);
         }
 

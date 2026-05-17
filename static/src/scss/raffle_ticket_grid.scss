@@ -170,35 +170,6 @@
     }
 }
 
-/* Mini popup de confirmación al seleccionar ticket */
-.raffle-popup {
-    position: absolute;
-    top: 110%;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 200;
-    min-width: 180px;
-}
-
-/* El ticket con popup abierto debe estar por encima de sus hermanos */
-.raffle-ticket:has(.raffle-popup) {
-    z-index: 150;
-}
-
-.raffle-popup-content {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    text-align: center;
-    font-size: 13px;
-}
-
-.raffle-popup-content p {
-    margin-bottom: 8px;
-}
-
 /* Estado loading */
 .raffle-ticket.raffle-loading {
     pointer-events: none;
