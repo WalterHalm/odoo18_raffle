@@ -40,12 +40,13 @@
                 </small>
             </div>
             <div class="mb-3 field-nickname">
-                <label for="nickname">Nickname <span class="text-muted">(opcional)</span></label>
+                <label for="nickname">Sobre nombre <span class="text-muted">(opcional)</span></label>
                 <input type="text" name="nickname"
-                       t-att-value="nickname"
+                       t-att-value="nickname or ''"
                        id="nickname"
                        class="form-control form-control-sm"
-                       placeholder="Tu apodo público en las rifas"/>
+                       placeholder="Tu apodo público en las rifas"
+                       autocomplete="off"/>
             </div>
         </xpath>
 

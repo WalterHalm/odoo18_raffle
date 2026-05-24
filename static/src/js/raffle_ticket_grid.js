@@ -171,8 +171,8 @@ publicWidget.registry.RaffleTicketGrid = publicWidget.Widget.extend({
                 return;
             }
 
-            // Redirigir directo al pago
-            window.location.href = '/shop/checkout?try_skip_step=true';
+            // Redirigir al carrito (periodo de reserva 5min para decidir)
+            window.location.href = '/shop/cart';
 
         } catch (error) {
             console.error('Error al reservar ticket:', error);

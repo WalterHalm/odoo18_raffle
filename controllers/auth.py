@@ -1,5 +1,6 @@
 from odoo import _
 from odoo.exceptions import UserError
+from odoo.http import request
 from odoo.addons.web.controllers.home import SIGN_UP_REQUEST_PARAMS
 from odoo.addons.auth_signup.controllers.main import AuthSignupHome
 
@@ -15,11 +16,27 @@ class AuthSignupHome(AuthSignupHome):
         dni = qcontext.get('dni_number', '').strip()
         whatsapp = qcontext.get('whatsapp_number', '').strip()
         nickname = qcontext.get('nickname', '').strip()
+        login = qcontext.get('login', '').strip()
 
         if not whatsapp:
             raise UserError(_('El número de WhatsApp es obligatorio.'))
         if not dni:
             raise UserError(_('El DNI es obligatorio.'))
+
+        # Validar email duplicado
+        if login:
+            existing_user = request.env['res.users'].sudo().search(
+                [('login', '=', login)], limit=1
+            )
+            if existing_user:
+                raise UserError(_('Ya existe una cuenta con este correo electrónico. Por favor inicie sesión.'))
+
+        # Validar DNI duplicado
+        existing_dni = request.env['res.partner'].sudo().search(
+            [('dni_number', '=', dni)], limit=1
+        )
+        if existing_dni:
+            raise UserError(_('Ya existe una cuenta registrada con este DNI.'))
 
         # Auto-generar nombre: nickname si existe, sino DNI
         if not qcontext.get('name') or not qcontext['name'].strip():

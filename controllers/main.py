@@ -139,7 +139,7 @@ class RaffleTicketController(http.Controller):
             line = request.env['sale.order.line'].sudo().browse(order_line['line_id'])
             line.raffle_ticket_id = ticket.id
 
-        return request.redirect('/shop/checkout?try_skip_step=true')
+        return request.redirect('/shop/cart')
 
     @http.route(['/ganadores', '/ganadores/page/<int:page>'], type='http', auth='public', website=True, sitemap=True)
     def raffle_winners(self, page=1, search='', **kw):
