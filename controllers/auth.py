@@ -12,7 +12,13 @@ class AuthSignupHome(AuthSignupHome):
     """Extensión mínima: solo valida campos custom y setea contraseña = DNI."""
 
     def _prepare_signup_values(self, qcontext):
-        """Valida WhatsApp/DNI, auto-genera nombre y setea contraseña = DNI."""
+        """Valida WhatsApp/DNI, auto-genera nombre y setea contraseña = DNI.
+        Solo aplica validaciones custom en registro nuevo (sin token).
+        El reset de contraseña usa token y no debe pasar por estas validaciones."""
+        # Si hay token, es reset de contraseña → flujo nativo sin validaciones custom
+        if qcontext.get('token'):
+            return super()._prepare_signup_values(qcontext)
+
         dni = qcontext.get('dni_number', '').strip()
         whatsapp = qcontext.get('whatsapp_number', '').strip()
         nickname = qcontext.get('nickname', '').strip()

@@ -59,6 +59,7 @@ class RaffleTicket(models.Model):
     ticket_price = fields.Float(related='raffle_id.ticket_price', string='Precio')
     currency_id = fields.Many2one(related='raffle_id.currency_id')
 
+
     _sql_constraints = [
         ('unique_raffle_number', 'UNIQUE(raffle_id, number)',
          'El numero de ticket debe ser unico por sorteo.'),
