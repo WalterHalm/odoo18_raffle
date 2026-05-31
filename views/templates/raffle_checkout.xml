@@ -9,4 +9,24 @@
         </xpath>
     </template>
 
+    <!-- Agregar botón "Continuar comprando" en la página de pago -->
+    <template id="raffle_payment_continue_shopping"
+              inherit_id="website_sale.navigation_buttons"
+              name="Botón Continuar Comprando en Pago">
+        <xpath expr="//a[hasclass('text-center')]" position="after">
+            <a href="/shop" class="text-center d-block mt-2">
+                <i class="fa fa-shopping-cart me-1"></i>
+                Continuar comprando
+            </a>
+        </xpath>
+    </template>
+
+    <!-- Ocultar selector de cantidad en página de producto para tickets de rifa -->
+    <template id="raffle_hide_product_quantity"
+              inherit_id="website_sale.product_quantity"
+              name="Ocultar Cantidad en Producto Rifa">
+        <xpath expr="//div[hasclass('css_quantity')]" position="attributes">
+            <attribute name="t-attf-class">css_quantity input-group #{product.is_raffle_ticket and 'd-none' or ''} ${{'d-none' if combination_info['prevent_zero_price_sale'] else 'd-inline-flex'}} me-2 mb-2 align-middle</attribute>
+        </xpath>
+    </template>
 </odoo>
