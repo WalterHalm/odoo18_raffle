@@ -50,6 +50,12 @@ class WebsiteSaleRaffle(WebsiteSale):
             return False
         return all(line.raffle_ticket_id for line in order.order_line)
 
+    def _get_shop_payment_values(self, order, **kwargs):
+        """Cambia el texto del botón de pago a 'Vamos a pagar'."""
+        values = super()._get_shop_payment_values(order, **kwargs)
+        values['submit_button_label'] = _('Vamos a pagar')
+        return values
+
 
 class RaffleTicketController(http.Controller):
     """Controller separado para las rutas JSON de tickets de rifa.
