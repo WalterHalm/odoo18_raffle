@@ -8,4 +8,13 @@
             <attribute name="class">col-lg-6 mb-2 d-none</attribute>
         </xpath>
     </template>
+
+    <!-- Cambiar título "Confirmar orden" por "Vamos a pagar" en /shop/payment -->
+    <template id="raffle_payment_title"
+              inherit_id="website_sale.payment"
+              name="Título Vamos a pagar">
+        <xpath expr="//h3[hasclass('mb-4')]" position="replace">
+            <h3 class="mb-4">Vamos a pagar</h3>
+        </xpath>
+    </template>
 </odoo>
