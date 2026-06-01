@@ -198,6 +198,14 @@
     -moz-appearance: textfield;
 }
 
+/* Ocultar selector de cantidad y boton Add to Cart en pagina de producto rifa.
+   La compra se realiza desde la cuadricula de numeros, no desde el boton nativo. */
+.oe_website_sale .raffle-grid-container ~ #o_wsale_cta_wrapper,
+.js_sale:has(.raffle-grid-container) .css_quantity,
+.js_sale:has(.raffle-grid-container) #add_to_cart_wrap {
+    display: none !important;
+}
+
 /* ===== Timeline de Ganadores ===== */
 .raffle-timeline {
     margin: 0 auto;

@@ -20,13 +20,4 @@
             </a>
         </xpath>
     </template>
-
-    <!-- Ocultar selector de cantidad y botón Add to Cart en página de producto rifa -->
-    <template id="raffle_hide_product_quantity"
-              inherit_id="website_sale.product"
-              name="Ocultar Cantidad y Add to Cart en Producto Rifa">
-        <xpath expr="//div[@id='o_wsale_cta_wrapper']" position="attributes">
-            <attribute name="t-attf-class">d-flex flex-wrap align-items-center #{product.is_raffle_ticket and 'd-none' or ''}</attribute>
-        </xpath>
-    </template>
 </odoo>
