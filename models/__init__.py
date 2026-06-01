@@ -6,3 +6,4 @@ from . import res_partner
 from . import res_users
 from . import res_config_settings
 from . import whatsapp_message
+from . import website
