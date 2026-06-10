@@ -13,6 +13,7 @@ __pycache__/
 # Documentacion interna (no es codigo del modulo)
 MANUAL_USUARIO_SORTEOS.md
 ALCANCE_PROYECTO_SORTEOS.md
+ALCANCE_PROYECTO_SORTEOS_V2.md
 nuevos_requerimientos.txt
 *.pdf
 DESPLIEGUE_PRODUCCION.md
