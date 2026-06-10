@@ -122,7 +122,7 @@ class RaffleTicketController(http.Controller):
 
     @http.route('/shop/raffle/reserve_and_pay/<int:ticket_id>', type='http', auth='user', website=True)
     def raffle_reserve_and_pay(self, ticket_id, **kwargs):
-        """Ruta HTTP que reserva un ticket y redirige al pago.
+        """Ruta HTTP que reserva un ticket y redirige al carrito.
         Usada como redirect después del login/registro."""
         ticket = request.env['raffle.ticket'].sudo().browse(ticket_id)
         if not ticket.exists() or ticket.state != 'available':
@@ -146,6 +146,24 @@ class RaffleTicketController(http.Controller):
             line.raffle_ticket_id = ticket.id
 
         return request.redirect('/shop/cart')
+
+    @http.route('/shop/raffle/confirm_order', type='http', auth='user', website=True)
+    def raffle_confirm_order(self, **kwargs):
+        """Confirma la orden directamente desde el carrito (sin paso de pago).
+        Ejecuta action_quotation_sent (marca tickets como sold) y redirige
+        al portal de la orden."""
+        order = request.website.sale_get_order()
+        if not order or not order.order_line:
+            return request.redirect('/shop/cart')
+
+        # Confirmar la orden (estado 'sent' + marca tickets como sold)
+        order.action_quotation_sent()
+
+        # Limpiar carrito de la sesión
+        request.website.sale_reset()
+
+        # Redirigir al portal de la orden
+        return request.redirect(order.get_portal_url())
 
     @http.route(['/ganadores', '/ganadores/page/<int:page>'], type='http', auth='public', website=True, sitemap=True)
     def raffle_winners(self, page=1, search='', **kw):
